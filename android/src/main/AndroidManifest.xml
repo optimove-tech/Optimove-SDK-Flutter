@@ -1,0 +1,7 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+  package="com.example.optimove_flutter_sdk">
+  <application>
+      <provider android:name=".OptimoveInitProvider"
+          android:authorities="${applicationId}.optimoveinitprovider"></provider>
+  </application>
+</manifest>
