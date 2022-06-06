@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-import 'package:optimove_flutter_sdk/optimove_flutter_sdk.dart';
+import 'package:optimove_flutter_sdk/optimove.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,7 +17,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
-  final _optimoveFlutterSdkPlugin = OptimoveFlutterSdk();
+  final _optimoveFlutterSdkPlugin = Optimove();
   late final TextEditingController textBoxController;
   late final TextEditingController buttonTextController;
   String setUserIdButtonText = "set user id";
@@ -64,9 +64,7 @@ class _MyAppState extends State<MyApp> {
         ),
         body: Center(
           child:Column(children: [Text('Running on: $_platformVersion\n'),TextField(controller: textBoxController,), ElevatedButton(onPressed: (){
-
-            OptimoveFlutterSdk.setUserId(userId: textBoxController.text);
-
+            Optimove.setUserId(userId: textBoxController.text);
             }, child: Text(setUserIdButtonText)),
           ],)
         ),

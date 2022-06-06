@@ -28,20 +28,13 @@ public class OptimoveFlutterSdkPlugin implements FlutterPlugin, MethodCallHandle
 
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
-    /*switch (call.method){//preparing for alot of different options
+    switch (call.method){//preparing for alot of different options
       case "setUserId":
         String userId = call.argument("userId");
         Optimove.getInstance().setUserId(userId);
-    }*/
-    if (call.method.equals("setUserId")){
-      String userId = call.argument("userId");
-      Optimove.getInstance().setUserId(userId);
-      result.success(null);
-    }
-    if (call.method.equals("getPlatformVersion")) {
-      result.success("Android " + android.os.Build.VERSION.RELEASE);
-    } else {
-      result.notImplemented();
+        result.success(null);
+        break;
+      default: result.notImplemented();
     }
   }
 
