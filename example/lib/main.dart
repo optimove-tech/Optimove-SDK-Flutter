@@ -21,12 +21,18 @@ class _MyAppState extends State<MyApp> {
   late final TextEditingController userIdTextController;
   late final TextEditingController emailTextController;
 
+  late final TextEditingController pageTitleTextController;
+  late final TextEditingController pageCategoryTextController;
+
   @override
   void initState() {
     super.initState();
     initPlatformState();
     userIdTextController = TextEditingController();
     emailTextController = TextEditingController();
+
+    pageTitleTextController = TextEditingController();
+    pageCategoryTextController = TextEditingController();
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
@@ -61,7 +67,7 @@ class _MyAppState extends State<MyApp> {
           padding: const EdgeInsets.all(16.0),
           child: Center(
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Card(
                 color: Colors.white30,
@@ -71,8 +77,7 @@ class _MyAppState extends State<MyApp> {
                         controller: userIdTextController,
                         decoration: const InputDecoration(
                           hintText: 'User id',
-                        )
-                    ),
+                        )),
                     ElevatedButton(
                         onPressed: () {
                           Optimove.setUserId(userId: userIdTextController.text);
@@ -83,8 +88,7 @@ class _MyAppState extends State<MyApp> {
                         controller: emailTextController,
                         decoration: const InputDecoration(
                           hintText: 'Email',
-                        )
-                    ),
+                        )),
                     ElevatedButton(
                         onPressed: () {
                           Optimove.setUserEmail(email: emailTextController.text);
@@ -98,8 +102,34 @@ class _MyAppState extends State<MyApp> {
                         child: const Text("Register user")),
                   ],
                 ),
+              ),
+              const SizedBox(height: 16),
+              Card(
+                color: Colors.white30,
+                child: Column(
+                  children: [
+                    TextField(
+                        controller: pageTitleTextController,
+                        decoration: const InputDecoration(
+                          hintText: 'Page title',
+                        )),
+                    TextField(
+                        controller: pageCategoryTextController,
+                        decoration: const InputDecoration(
+                          hintText: 'Page category (optional)',
+                        )),
+                    ElevatedButton(
+                        onPressed: () {
+                          if (pageCategoryTextController.text.isEmpty) {
+                            Optimove.reportScreenVisit(screenName: pageTitleTextController.text);
+                          } else {
+                            Optimove.reportScreenVisit(screenName: pageTitleTextController.text, screenCategory: pageCategoryTextController.text);
+                          }
+                        },
+                        child: const Text("Report screen visit")),
+                  ],
+                ),
               )
-
             ],
           )),
         ),
