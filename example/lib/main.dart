@@ -18,21 +18,16 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
   final _optimoveFlutterSdkPlugin = Optimove();
-  late final TextEditingController textBoxController;
-  late final TextEditingController buttonTextController;
-  String setUserIdButtonText = "set user id";
+  late final TextEditingController userIdTextController;
+  late final TextEditingController emailTextController;
 
   @override
   void initState() {
     super.initState();
     initPlatformState();
-    textBoxController = TextEditingController();
-    buttonTextController = TextEditingController();
+    userIdTextController = TextEditingController();
+    emailTextController = TextEditingController();
   }
-
-  static int counter = 0;
-
-  void setUserId() {}
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
@@ -60,22 +55,54 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Plugin example app'),
+          title: const Text('Optimove SDK QA'),
         ),
-        body: Center(
-            child: Column(
-          children: [
-            Text('Running on: $_platformVersion\n'),
-            TextField(
-              controller: textBoxController,
-            ),
-            ElevatedButton(
-                onPressed: () {
-                  Optimove.setUserId(userId: textBoxController.text);
-                },
-                child: Text(setUserIdButtonText)),
-          ],
-        )),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Card(
+                color: Colors.white30,
+                child: Column(
+                  children: [
+                    TextField(
+                        controller: userIdTextController,
+                        decoration: const InputDecoration(
+                          hintText: 'User id',
+                        )
+                    ),
+                    ElevatedButton(
+                        onPressed: () {
+                          Optimove.setUserId(userId: userIdTextController.text);
+                        },
+                        child: const Text("Set user id")),
+                    const SizedBox(height: 16),
+                    TextField(
+                        controller: emailTextController,
+                        decoration: const InputDecoration(
+                          hintText: 'Email',
+                        )
+                    ),
+                    ElevatedButton(
+                        onPressed: () {
+                          Optimove.setUserEmail(email: emailTextController.text);
+                        },
+                        child: const Text("Set email")),
+                    const SizedBox(height: 8),
+                    ElevatedButton(
+                        onPressed: () {
+                          Optimove.registerUser(userId: userIdTextController.text, email: emailTextController.text);
+                        },
+                        child: const Text("Register user")),
+                  ],
+                ),
+              )
+
+            ],
+          )),
+        ),
       ),
     );
   }

@@ -67,7 +67,7 @@ public class OptimoveFlutterSdkPlugin implements FlutterPlugin, MethodCallHandle
     if (screenCategory == null) {
       Optimove.getInstance().reportScreenVisit(call.argument("screenName"));
     } else {
-      Optimove.getInstance().reportEvent(call.argument("event"), screenCategory);
+      Optimove.getInstance().reportScreenVisit(call.argument("event"), screenCategory);
     }
     result.success(null);
   }
@@ -76,7 +76,8 @@ public class OptimoveFlutterSdkPlugin implements FlutterPlugin, MethodCallHandle
     Map<String, Object> parameters = call.argument("parameters");
 
     if (parameters == null) {
-      Optimove.getInstance().reportEvent(call.argument("event"));
+      String event = call.argument("event");
+      Optimove.getInstance().reportEvent(event);
     } else {
       Optimove.getInstance().reportEvent(call.argument("event"), parameters);
 
