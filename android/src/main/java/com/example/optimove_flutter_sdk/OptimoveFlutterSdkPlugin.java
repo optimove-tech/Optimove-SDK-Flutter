@@ -67,7 +67,7 @@ public class OptimoveFlutterSdkPlugin implements FlutterPlugin, MethodCallHandle
     if (screenCategory == null) {
       Optimove.getInstance().reportScreenVisit(call.argument("screenName"));
     } else {
-      Optimove.getInstance().reportScreenVisit(call.argument("event"), screenCategory);
+      Optimove.getInstance().reportScreenVisit(call.argument("screenName"), screenCategory);
     }
     result.success(null);
   }

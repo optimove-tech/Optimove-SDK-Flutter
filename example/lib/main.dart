@@ -16,8 +16,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
-  final _optimoveFlutterSdkPlugin = Optimove();
   late final TextEditingController userIdTextController;
   late final TextEditingController emailTextController;
 
@@ -26,10 +24,14 @@ class _MyAppState extends State<MyApp> {
 
   late final TextEditingController eventNameTextController;
 
+  String optimobileIdentifier = "";
+  String optimoveVisitorId = "";
+  Map<String, dynamic> eventParams = {};
+
   @override
   void initState() {
     super.initState();
-    initPlatformState();
+    getIdentifiers();
     userIdTextController = TextEditingController();
     emailTextController = TextEditingController();
 
@@ -39,60 +41,38 @@ class _MyAppState extends State<MyApp> {
     eventNameTextController = TextEditingController();
   }
 
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    String platformVersion;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    // We also handle the message potentially returning null.
-    try {
-      platformVersion = await _optimoveFlutterSdkPlugin.getPlatformVersion() ?? 'Unknown platform version';
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
-    }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-    setState(() {
-      _platformVersion = platformVersion;
-    });
+  Future<void> getIdentifiers() async {
+    optimobileIdentifier = await Optimove.getCurrentUserIdentifier();
+    optimoveVisitorId = await Optimove.getVisitorId();
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        colorScheme: const ColorScheme(
-          brightness: Brightness.light,
-          primary: Color.fromARGB(255, 255, 133, 102),
-          onPrimary: Colors.white,
-          secondary: Colors.pink,
-          onSecondary: Colors.pink,
-          error: Colors.pink,
-          onError: Colors.pink,
-          background: Colors.pink,
-          onBackground: Colors.pink,
-          surface: Colors.pink,
-          onSurface: Colors.black,
-        )
-      ),
+          colorScheme: const ColorScheme(
+        brightness: Brightness.light,
+        primary: Color.fromARGB(255, 255, 133, 102),
+        onPrimary: Colors.white,
+        secondary: Colors.pink,
+        onSecondary: Colors.pink,
+        error: Colors.pink,
+        onError: Colors.pink,
+        background: Colors.pink,
+        onBackground: Colors.pink,
+        surface: Colors.pink,
+        onSurface: Colors.black,
+      )),
       home: Scaffold(
         appBar: AppBar(
           title: const Text('Optimove Flutter QA'),
         ),
         body: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
           child: SingleChildScrollView(
             child: Column(
-              children: [
-                _getUserIdentitySection(),
-                const SizedBox(height: 8),
-                _getScreenVisitSection(),
-                const SizedBox(height: 8),
-                _getReportEventSection()
-              ],
+              children: [_userInfoSection(), _getUserIdentitySection(), const SizedBox(height: 8), _getScreenVisitSection(), const SizedBox(height: 8), _getReportEventSection()],
             ),
           ),
         ),
@@ -100,7 +80,23 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  Widget _getUserIdentitySection(){
+  Widget _userInfoSection() {
+    return Card(
+      color: const Color.fromARGB(255, 167, 184, 204),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            Container(alignment: Alignment.centerLeft, child: Text("Current user id: $optimobileIdentifier")),
+            const SizedBox(height: 8),
+            Container(alignment: Alignment.centerLeft, child: Text("Current visitor id: $optimoveVisitorId")),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _getUserIdentitySection() {
     return Card(
       color: const Color.fromARGB(255, 167, 184, 204),
       child: Padding(
@@ -113,8 +109,10 @@ class _MyAppState extends State<MyApp> {
                   hintText: 'User id',
                 )),
             ElevatedButton(
+                style: _getButtonStyle(),
                 onPressed: () {
                   Optimove.setUserId(userId: userIdTextController.text);
+                  getIdentifiers();
                 },
                 child: const Text("Set user id")),
             TextField(
@@ -123,14 +121,17 @@ class _MyAppState extends State<MyApp> {
                   hintText: 'Email',
                 )),
             ElevatedButton(
+                style: _getButtonStyle(),
                 onPressed: () {
                   Optimove.setUserEmail(email: emailTextController.text);
                 },
                 child: const Text("Set email")),
             const SizedBox(height: 8),
             ElevatedButton(
+                style: _getButtonStyle(),
                 onPressed: () {
                   Optimove.registerUser(userId: userIdTextController.text, email: emailTextController.text);
+                  getIdentifiers();
                 },
                 child: const Text("Register user")),
           ],
@@ -139,7 +140,7 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  Widget _getScreenVisitSection(){
+  Widget _getScreenVisitSection() {
     return Card(
       color: const Color.fromARGB(255, 167, 184, 204),
       child: Padding(
@@ -157,6 +158,7 @@ class _MyAppState extends State<MyApp> {
                   hintText: 'Page category (optional)',
                 )),
             ElevatedButton(
+                style: _getButtonStyle(),
                 onPressed: () {
                   if (pageCategoryTextController.text.isEmpty) {
                     Optimove.reportScreenVisit(screenName: pageTitleTextController.text);
@@ -171,7 +173,7 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  Widget _getReportEventSection(){
+  Widget _getReportEventSection() {
     return Card(
       color: const Color.fromARGB(255, 167, 184, 204),
       child: Padding(
@@ -184,6 +186,7 @@ class _MyAppState extends State<MyApp> {
                   hintText: 'Event name',
                 )),
             ElevatedButton(
+                style: _getButtonStyle(),
                 onPressed: () {
                   Optimove.reportEvent(event: eventNameTextController.text);
                 },
@@ -192,5 +195,9 @@ class _MyAppState extends State<MyApp> {
         ),
       ),
     );
+  }
+
+  ButtonStyle _getButtonStyle() {
+    return ElevatedButton.styleFrom(shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16))));
   }
 }
