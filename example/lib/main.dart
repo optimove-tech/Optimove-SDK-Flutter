@@ -63,20 +63,34 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        colorScheme: const ColorScheme(
+          brightness: Brightness.light,
+          primary: Color.fromARGB(255, 255, 133, 102),
+          onPrimary: Colors.white,
+          secondary: Colors.pink,
+          onSecondary: Colors.pink,
+          error: Colors.pink,
+          onError: Colors.pink,
+          background: Colors.pink,
+          onBackground: Colors.pink,
+          surface: Colors.pink,
+          onSurface: Colors.black,
+        )
+      ),
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Optimove SDK QA'),
+          title: const Text('Optimove Flutter QA'),
         ),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
           child: SingleChildScrollView(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 _getUserIdentitySection(),
-                const SizedBox(height: 16),
+                const SizedBox(height: 8),
                 _getScreenVisitSection(),
-                const SizedBox(height: 16),
+                const SizedBox(height: 8),
                 _getReportEventSection()
               ],
             ),
@@ -88,86 +102,94 @@ class _MyAppState extends State<MyApp> {
 
   Widget _getUserIdentitySection(){
     return Card(
-      color: Colors.white30,
-      child: Column(
-        children: [
-          TextField(
-              controller: userIdTextController,
-              decoration: const InputDecoration(
-                hintText: 'User id',
-              )),
-          ElevatedButton(
-              onPressed: () {
-                Optimove.setUserId(userId: userIdTextController.text);
-              },
-              child: const Text("Set user id")),
-          const SizedBox(height: 16),
-          TextField(
-              controller: emailTextController,
-              decoration: const InputDecoration(
-                hintText: 'Email',
-              )),
-          ElevatedButton(
-              onPressed: () {
-                Optimove.setUserEmail(email: emailTextController.text);
-              },
-              child: const Text("Set email")),
-          const SizedBox(height: 8),
-          ElevatedButton(
-              onPressed: () {
-                Optimove.registerUser(userId: userIdTextController.text, email: emailTextController.text);
-              },
-              child: const Text("Register user")),
-        ],
+      color: const Color.fromARGB(255, 167, 184, 204),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            TextField(
+                controller: userIdTextController,
+                decoration: const InputDecoration(
+                  hintText: 'User id',
+                )),
+            ElevatedButton(
+                onPressed: () {
+                  Optimove.setUserId(userId: userIdTextController.text);
+                },
+                child: const Text("Set user id")),
+            TextField(
+                controller: emailTextController,
+                decoration: const InputDecoration(
+                  hintText: 'Email',
+                )),
+            ElevatedButton(
+                onPressed: () {
+                  Optimove.setUserEmail(email: emailTextController.text);
+                },
+                child: const Text("Set email")),
+            const SizedBox(height: 8),
+            ElevatedButton(
+                onPressed: () {
+                  Optimove.registerUser(userId: userIdTextController.text, email: emailTextController.text);
+                },
+                child: const Text("Register user")),
+          ],
+        ),
       ),
     );
   }
 
   Widget _getScreenVisitSection(){
     return Card(
-      color: Colors.white30,
-      child: Column(
-        children: [
-          TextField(
-              controller: pageTitleTextController,
-              decoration: const InputDecoration(
-                hintText: 'Page title',
-              )),
-          TextField(
-              controller: pageCategoryTextController,
-              decoration: const InputDecoration(
-                hintText: 'Page category (optional)',
-              )),
-          ElevatedButton(
-              onPressed: () {
-                if (pageCategoryTextController.text.isEmpty) {
-                  Optimove.reportScreenVisit(screenName: pageTitleTextController.text);
-                } else {
-                  Optimove.reportScreenVisit(screenName: pageTitleTextController.text, screenCategory: pageCategoryTextController.text);
-                }
-              },
-              child: const Text("Report screen visit")),
-        ],
+      color: const Color.fromARGB(255, 167, 184, 204),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            TextField(
+                controller: pageTitleTextController,
+                decoration: const InputDecoration(
+                  hintText: 'Page title',
+                )),
+            TextField(
+                controller: pageCategoryTextController,
+                decoration: const InputDecoration(
+                  hintText: 'Page category (optional)',
+                )),
+            ElevatedButton(
+                onPressed: () {
+                  if (pageCategoryTextController.text.isEmpty) {
+                    Optimove.reportScreenVisit(screenName: pageTitleTextController.text);
+                  } else {
+                    Optimove.reportScreenVisit(screenName: pageTitleTextController.text, screenCategory: pageCategoryTextController.text);
+                  }
+                },
+                child: const Text("Report screen visit")),
+          ],
+        ),
       ),
     );
   }
 
   Widget _getReportEventSection(){
     return Card(
-      color: Colors.white30,
-      child: Column(
-        children: [
-          TextField(
-              controller: eventNameTextController,
-              decoration: const InputDecoration(
-                hintText: 'Event name',
-              )),
-          ElevatedButton(
-              onPressed: () {
-                Optimove.reportEvent(event: eventNameTextController.text);
-              },
-              child: const Text("Report event")),
-        ],
+      color: const Color.fromARGB(255, 167, 184, 204),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            TextField(
+                controller: eventNameTextController,
+                decoration: const InputDecoration(
+                  hintText: 'Event name',
+                )),
+            ElevatedButton(
+                onPressed: () {
+                  Optimove.reportEvent(event: eventNameTextController.text);
+                },
+                child: const Text("Report event")),
+          ],
+        ),
       ),
     );
   }
