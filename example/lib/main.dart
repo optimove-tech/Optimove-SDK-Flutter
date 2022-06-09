@@ -24,7 +24,7 @@ class _MyAppState extends State<MyApp> {
 
   late final TextEditingController eventNameTextController;
 
-  String optimobileIdentifier = "";
+  String? optimobileIdentifier = "";
   String optimoveVisitorId = "";
   Map<String, dynamic> eventParams = {};
 
