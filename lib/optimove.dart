@@ -34,8 +34,8 @@ class Optimove {
     return _channel.invokeMethod('reportScreenVisit', {'screenName': screenName, 'screenCategory': screenCategory});
   }
 
-  static Future<String> getCurrentUserIdentifier() async {
-    String userIdentifier = await _channel.invokeMethod('getCurrentUserIdentifier');
+  static Future<String?> getCurrentUserIdentifier() async {
+    String? userIdentifier = await _channel.invokeMethod('getCurrentUserIdentifier');
     return userIdentifier;
   }
 }
