@@ -3,9 +3,7 @@ import UIKit
 import OptimoveSDK
 
 public class SwiftOptimoveFlutterSdkPlugin: NSObject, FlutterPlugin {
-    
 
-    
   public static func register(with registrar: FlutterPluginRegistrar) {
     let channel = FlutterMethodChannel(name: "optimove_flutter_sdk", binaryMessenger: registrar.messenger())
     initOptimove(assetKey: registrar.lookupKey(forAsset: "optimove.json"))
@@ -66,14 +64,31 @@ public class SwiftOptimoveFlutterSdkPlugin: NSObject, FlutterPlugin {
         let optimoveKeys = try! JSONDecoder().decode(OptimoveKeys.self, from: jsonData!)
         
         let config = OptimoveConfigBuilder(optimoveCredentials: optimoveKeys.optimoveCredentials, optimobileCredentials: optimoveKeys.optimobileCredentials)
-                    .build()
+                    .enableDeepLinking({ deepLinkResolution in
+                                    let center = NotificationCenter.default
+                                    let deepLinkDict = ["DeepLink" : deepLinkResolution]
+                                    center.post(name: NSNotification.Name(rawValue: "DeepLinking"), object: nil, userInfo: deepLinkDict)
+                                    print(deepLinkResolution)
+                                })
+                                .setInAppDeepLinkHandler(inAppDeepLinkHandlerBlock: { inAppButtonPress in
+                                    print("dsfgdfgd")
+                                })
+                                .setPushOpenedHandler(pushOpenedHandlerBlock: { notification in
+                                    notification.
+                                })
+                                .enableInAppMessaging(inAppConsentStrategy: optimoveKeys.inAppConsentStrategy == "auto-enroll" ? .autoEnroll : .explicitByUser)
+                                .build()
 
         Optimove.initialize(with: config)
+        Optimove.shared.pushRequestDeviceToken()
+
     }
 }
 
 struct OptimoveKeys: Codable {
     let optimoveCredentials: String
     let optimobileCredentials: String
+    var inAppConsentStrategy: String?
+    var enableDeferredDeepLinking: Bool?
 }
 
