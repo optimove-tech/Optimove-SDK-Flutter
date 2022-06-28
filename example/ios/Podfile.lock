@@ -1,6 +1,6 @@
 PODS:
   - Flutter (1.0.0)
-  - optimove_flutter_sdk (0.0.1):
+  - optimove_sdk_flutter (0.0.1):
     - Flutter
     - OptimoveCore (= 5.0.0)
     - OptimoveSDK (= 5.0.0)
@@ -10,7 +10,7 @@ PODS:
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
-  - optimove_flutter_sdk (from `.symlinks/plugins/optimove_flutter_sdk/ios`)
+  - optimove_sdk_flutter (from `.symlinks/plugins/optimove_sdk_flutter/ios`)
 
 SPEC REPOS:
   trunk:
@@ -20,12 +20,12 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   Flutter:
     :path: Flutter
-  optimove_flutter_sdk:
-    :path: ".symlinks/plugins/optimove_flutter_sdk/ios"
+  optimove_sdk_flutter:
+    :path: ".symlinks/plugins/optimove_sdk_flutter/ios"
 
 SPEC CHECKSUMS:
   Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
-  optimove_flutter_sdk: 908732ec2c25649e600dd5d63fc02a36f4763943
+  optimove_sdk_flutter: 7466a639a158a2807fedcd4ee69fd126f5164738
   OptimoveCore: d847048dba52605a24dc0f7f02e3622edbbdfe3f
   OptimoveSDK: 3b80312856e3909949ccad83e4064e111182040a
 

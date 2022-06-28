@@ -1,4 +1,4 @@
-package com.example.optimove_flutter_sdk;
+package com.optimove.flutter;
 
 import android.app.Application;
 import android.content.ContentProvider;
@@ -14,6 +14,7 @@ import androidx.annotation.Nullable;
 
 import com.optimove.android.Optimove;
 import com.optimove.android.OptimoveConfig;
+import com.optimove.android.optimobile.DeferredDeepLinkHandlerInterface;
 
 import java.io.File;
 import java.io.IOException;
@@ -118,8 +119,12 @@ public class OptimoveInitProvider extends ContentProvider {
         } finally {
             reader.close();
         }
+        DeferredDeepLinkHandlerInterface handler = (context, resolution, link, data) -> {
 
-      return new OptimoveConfig.Builder(optimoveCredentials,optimobileCredentilas);
+        };
+
+      return new OptimoveConfig.Builder(optimoveCredentials,optimobileCredentilas).enableInAppMessaging(OptimoveConfig.InAppConsentStrategy.AUTO_ENROLL)
+              .enableDeepLinking(handler);
     }
 }
 

@@ -1,5 +1,5 @@
 name: Optimove
-description: Demonstrates how to use the optimove_flutter_sdk plugin.
+description: Demonstrates how to use the optimove_sdk_flutter plugin.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -18,7 +18,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  optimove_flutter_sdk:
+  optimove_sdk_flutter:
     # When depending on this package from a real application you should use:
     #   optimove_flutter_sdk: ^x.y.z
     # See https://dart.dev/tools/pub/dependencies#version-constraints

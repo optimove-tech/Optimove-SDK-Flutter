@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-import 'package:optimove_flutter_sdk/optimove.dart';
+import 'package:optimove_sdk_flutter/optimove.dart';
 
 void main() {
   runApp(const MyApp());

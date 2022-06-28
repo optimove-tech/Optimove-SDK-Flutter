@@ -1,4 +1,4 @@
-name: optimove_flutter_sdk
+name: optimove_sdk_flutter
 description: A new Flutter plugin project.
 version: 0.0.1
 homepage:
@@ -35,7 +35,7 @@ flutter:
   plugin:
     platforms:
       android:
-        package: com.example.optimove_flutter_sdk
+        package: com.optimove.flutter
         pluginClass: OptimoveFlutterSdkPlugin
       ios:
         pluginClass: OptimoveFlutterSdkPlugin

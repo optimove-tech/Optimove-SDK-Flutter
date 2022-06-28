@@ -3,7 +3,7 @@
 # Run `pod lib lint optimove_flutter_sdk.podspec` to validate before publishing.
 #
 Pod::Spec.new do |s|
-  s.name             = 'optimove_flutter_sdk'
+  s.name             = 'optimove_sdk_flutter'
   s.version          = '0.0.1'
   s.summary          = 'A new Flutter plugin project.'
   s.description      = <<-DESC

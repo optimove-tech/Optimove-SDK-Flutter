@@ -1,4 +1,4 @@
-package com.example.optimove_flutter_sdk;
+package com.optimove.flutter;
 
 import androidx.annotation.NonNull;
 
