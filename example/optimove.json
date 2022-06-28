@@ -1,4 +1,6 @@
 {
   "optimoveCredentials": "WzEsICJpbnRlcm5hbC10b2tlbiIsICJxYS1kaXJlY3QtcnQiXQ==",
-  "optimobileCredentials": "WzEsImV1LWNlbnRyYWwtMSIsIjE2NGFmZTczLTE4NDQtNDZkMy05NGU0LTBmNWEwZGMyODc1NyIsIkVWRGVYdzdqN0V0blpzK3JVdzVBaFZCNmtlYlYrYjBQSlVHdCJd"
+  "optimobileCredentials": "WzEsImV1LWNlbnRyYWwtMSIsIjE2NGFmZTczLTE4NDQtNDZkMy05NGU0LTBmNWEwZGMyODc1NyIsIkVWRGVYdzdqN0V0blpzK3JVdzVBaFZCNmtlYlYrYjBQSlVHdCJd",
+  "inAppConsentStrategy": "auto-enroll",
+  "enableDeferredDeepLinking": true
 }
