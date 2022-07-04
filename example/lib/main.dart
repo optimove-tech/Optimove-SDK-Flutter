@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/services.dart';
 import 'package:optimove_sdk_flutter/optimove.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
@@ -31,7 +33,8 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    getIdentifiers();
+    initListeners();
+    // getIdentifiers();
     userIdTextController = TextEditingController();
     emailTextController = TextEditingController();
 
@@ -41,6 +44,22 @@ class _MyAppState extends State<MyApp> {
     eventNameTextController = TextEditingController();
   }
 
+  Future<void> initListeners()async{
+    Optimove.setEventHandlers(pushOpenedHandler: (push) {
+      optimobileIdentifier = 'dflkgmjdsflkgdsfkjghs';
+      setState(() {
+      });
+
+      _showAlert('Opened Push', <Widget>[
+        Text(push.title ?? 'No title'),
+        Text(push.message ?? 'No message'),
+        const Text(''),
+        Text('Action button tapped: ${push.actionId ?? 'none'}'),
+        const Text('Data:'),
+        Text(jsonEncode(push.data))
+      ]);
+    });
+  }
   Future<void> getIdentifiers() async {
     optimobileIdentifier = await Optimove.getCurrentUserIdentifier();
     optimoveVisitorId = await Optimove.getVisitorId();
@@ -195,6 +214,29 @@ class _MyAppState extends State<MyApp> {
         ),
       ),
     );
+  }
+
+  void _showAlert(String title, List<Widget> children) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(title),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: children,
+              ),
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
   }
 
   ButtonStyle _getButtonStyle() {

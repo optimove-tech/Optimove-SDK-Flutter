@@ -34,5 +34,5 @@ android {
     }
 }
 dependencies {
-    implementation 'com.optimove.android:optimove-android:5.+'
+    api 'com.optimove.android:optimove-android:5.+'
 }

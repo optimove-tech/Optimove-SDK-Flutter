@@ -63,6 +63,7 @@ public class SwiftOptimoveFlutterSdkPlugin: NSObject, FlutterPlugin {
         let jsonData = try! String(contentsOfFile: topPath).data(using: .utf8)
         let optimoveKeys = try! JSONDecoder().decode(OptimoveKeys.self, from: jsonData!)
         
+        let flutterEventChannel: FlutterEventChannel = FlutterEventChannel("kumulos_sdk_flutter_events")
         let config = OptimoveConfigBuilder(optimoveCredentials: optimoveKeys.optimoveCredentials, optimobileCredentials: optimoveKeys.optimobileCredentials)
                     .enableDeepLinking({ deepLinkResolution in
                                     let center = NotificationCenter.default
@@ -74,7 +75,7 @@ public class SwiftOptimoveFlutterSdkPlugin: NSObject, FlutterPlugin {
                                     print("dsfgdfgd")
                                 })
                                 .setPushOpenedHandler(pushOpenedHandlerBlock: { notification in
-                                    notification.
+                                    flutterEventChannel.call(notification) and  put type here to be "push.opened"
                                 })
                                 .enableInAppMessaging(inAppConsentStrategy: optimoveKeys.inAppConsentStrategy == "auto-enroll" ? .autoEnroll : .explicitByUser)
                                 .build()
