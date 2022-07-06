@@ -26,10 +26,12 @@ class Optimove {
   static StreamSubscription? _eventStream;
 
   static void Function(OptimovePushNotification)? _pushOpenedHandler;
+  static void Function(OptimovePushNotification)? _pushReceivedHandler;
 
-  static void setEventHandlers({void Function(OptimovePushNotification)? pushOpenedHandler}){
+  static void setEventHandlers({void Function(OptimovePushNotification)? pushReceivedHandler, void Function(OptimovePushNotification)? pushOpenedHandler}){
     _pushOpenedHandler = pushOpenedHandler;
-    if (pushOpenedHandler == null) {
+    _pushReceivedHandler = pushReceivedHandler;
+    if (pushOpenedHandler == null && pushReceivedHandler == null) {
       _eventStream?.cancel();
       _eventStream = null;
       return;
@@ -39,17 +41,16 @@ class Optimove {
       return;
     }
 
-    setEventStream();
-  }
-
-  static void setEventStream() {
-     _eventStream = _eventChannel.receiveBroadcastStream().listen((event) {
+    _eventStream = _eventChannel.receiveBroadcastStream().listen((event) {
       String type = event['type'];
       Map<String, dynamic> data = Map<String, dynamic>.from(event['data']);
 
       switch (type) {
         case 'push.opened':
           _pushOpenedHandler?.call(OptimovePushNotification.fromMap(data));
+          return;
+        case 'push.received':
+          _pushReceivedHandler?.call(OptimovePushNotification.fromMap(data));
           return;
       }
     });
