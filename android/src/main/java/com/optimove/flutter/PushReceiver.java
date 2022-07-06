@@ -1,21 +1,16 @@
 package com.optimove.flutter;
 
-
 import android.app.Activity;
 import android.app.TaskStackBuilder;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-
-
 import com.optimove.android.Optimove;
 import com.optimove.android.optimobile.Optimobile;
 import com.optimove.android.optimobile.PushActionHandlerInterface;
 import com.optimove.android.optimobile.PushBroadcastReceiver;
 import com.optimove.android.optimobile.PushMessage;
-
 import org.json.JSONException;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,7 +45,7 @@ public class PushReceiver extends PushBroadcastReceiver {
         Map<String, Object> event = new HashMap<>(2);
         event.put("type", "push.received");
         event.put("data", pushMessageToMap(pushMessage, null));
-        // OptimoveFlutterSdkPlugin.eventSink.send(event, false);
+        OptimoveFlutterSdkPlugin.eventSink.send(event, false);
     }
 
     @Override
@@ -58,7 +53,6 @@ public class PushReceiver extends PushBroadcastReceiver {
         try {
             Optimove.getInstance().pushTrackOpen(pushMessage.getId());
         } catch (Optimobile.UninitializedException ignored) {
-
         }
 
         PushReceiver.handlePushOpen(context, pushMessage, null);
@@ -117,5 +111,15 @@ public class PushReceiver extends PushBroadcastReceiver {
         event.put("type", "push.opened");
         event.put("data", pushMessageToMap(pushMessage, actionId));
         OptimoveFlutterSdkPlugin.eventSink.send(event);
+    }
+
+    static class PushActionHandler implements PushActionHandlerInterface {
+        @Override
+        public void handle(Context context, PushMessage pushMessage, String actionId) {
+            PushReceiver.handlePushOpen(context, pushMessage, actionId);
+
+            Intent it = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+            context.sendBroadcast(it);
+        }
     }
 }
