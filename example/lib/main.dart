@@ -1,23 +1,28 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'dart:convert';
-
 import 'package:flutter/services.dart';
 import 'package:optimove_sdk_flutter/optimove.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
-class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
-
+class MyApp extends StatelessWidget {
   @override
-  State<MyApp> createState() => _MyAppState();
+  Widget build(BuildContext context) {
+    return MaterialApp(home: HomePage());
+  }
 }
 
-class _MyAppState extends State<MyApp> {
+class HomePage extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return _MyAppState();
+  }
+}
+
+class _MyAppState extends State<HomePage> {
   late final TextEditingController userIdTextController;
   late final TextEditingController emailTextController;
 
@@ -34,7 +39,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     initListeners();
-    // getIdentifiers();
+    getIdentifiers();
     userIdTextController = TextEditingController();
     emailTextController = TextEditingController();
 
@@ -45,18 +50,15 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> initListeners()async{
-    Optimove.setEventHandlers(pushOpenedHandler: (push) {
-      optimobileIdentifier = 'dflkgmjdsflkgdsfkjghs';
-      setState(() {
-      });
-
-      _showAlert('Opened Push', <Widget>[
+    Optimove.setEventHandlers(pushReceivedHandler: (push) {
+      _showAlert('Received Push', <Widget>[
         Text(push.title ?? 'No title'),
         Text(push.message ?? 'No message'),
-        const Text(''),
-        Text('Action button tapped: ${push.actionId ?? 'none'}'),
-        const Text('Data:'),
-        Text(jsonEncode(push.data))
+      ]);
+    }, pushOpenedHandler: (push) {
+      _showAlert('Opened push', <Widget>[
+        Text(push.title ?? 'No title'),
+        Text(push.message ?? 'No message'),
       ]);
     });
   }
