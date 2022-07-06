@@ -28,19 +28,44 @@ public class OptimoveFlutterSdkPlugin implements FlutterPlugin, MethodCallHandle
   /// when the Flutter Engine is detached from the Activity
   private MethodChannel channel;
   private EventChannel eventChannel;
+  private EventChannel inAppEventChannel;
   private Context context;
-
 
   static WeakReference<Activity> currentActivityRef = new WeakReference<>(null);
   static QueueingEventStreamHandler eventSink = new QueueingEventStreamHandler();
+  static EventChannel.EventSink inAppEventSink;
 
   @Override
   public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
     context = flutterPluginBinding.getApplicationContext();
+
     channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "optimove_flutter_sdk");
     channel.setMethodCallHandler(this);
+
     eventChannel = new EventChannel(flutterPluginBinding.getBinaryMessenger(), "optimove_flutter_sdk_events");
     eventChannel.setStreamHandler(eventSink);
+
+    inAppEventChannel = new EventChannel(flutterPluginBinding.getBinaryMessenger(), "optimove_flutter_sdk_events_in_app");
+    inAppEventChannel.setStreamHandler(new EventChannel.StreamHandler() {
+      @Override
+      public void onListen(Object arguments, EventChannel.EventSink eventSink) {
+        inAppEventSink = eventSink;
+      }
+
+      @Override
+      public void onCancel(Object arguments) {
+        inAppEventSink = null;
+      }
+    });
+  }
+
+  @Override
+  public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
+    channel.setMethodCallHandler(null);
+    eventChannel.setStreamHandler(null);
+    eventSink.onCancel(null);
+    inAppEventChannel.setStreamHandler(null);
+    context = null;
   }
 
   @Override
@@ -142,16 +167,6 @@ public class OptimoveFlutterSdkPlugin implements FlutterPlugin, MethodCallHandle
     Optimove.getInstance().registerUser(userId, email);
     result.success(null);
   }
-
-  @Override
-  public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
-
-    channel.setMethodCallHandler(null);
-    eventChannel.setStreamHandler(null);
-    eventSink.onCancel(null);
-    context = null;
-  }
-
 
   /**
    * package
