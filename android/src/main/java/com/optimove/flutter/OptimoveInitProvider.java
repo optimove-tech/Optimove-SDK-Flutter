@@ -56,7 +56,7 @@ public class OptimoveInitProvider extends ContentProvider {
         Application application = (Application) getContext().getApplicationContext();
         Optimove.initialize(application, config.build());
 
-        return false;
+        return true;
     }
 
     @Nullable
