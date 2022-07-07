@@ -85,4 +85,8 @@ class Optimove {
     String? userIdentifier = await _methodChannel.invokeMethod('getCurrentUserIdentifier');
     return userIdentifier;
   }
+
+  static Future<void> pushRequestDeviceToken() {
+    return _methodChannel.invokeMethod('pushRequestDeviceToken');
+  }
 }

@@ -95,7 +95,13 @@ class _MyAppState extends State<HomePage> {
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
           child: SingleChildScrollView(
             child: Column(
-              children: [_userInfoSection(), _getUserIdentitySection(), const SizedBox(height: 8), _getScreenVisitSection(), const SizedBox(height: 8), _getReportEventSection()],
+              children: [_userInfoSection(), _getUserIdentitySection(), const SizedBox(height: 8), _getScreenVisitSection(), const SizedBox(height: 8), _getReportEventSection(),
+                ElevatedButton(
+                  style: _getButtonStyle(),
+                  onPressed: () {
+                    Optimove.pushRequestDeviceToken();
+                  },
+                  child: const Text("Set user id")) ],
             ),
           ),
         ),
