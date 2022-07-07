@@ -9,27 +9,19 @@ import android.net.Uri;
 import android.util.JsonReader;
 import android.util.JsonToken;
 import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
 import com.optimove.android.Optimove;
 import com.optimove.android.OptimoveConfig;
 import com.optimove.android.optimobile.DeferredDeepLinkHandlerInterface;
-
 import org.json.JSONException;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
-import java.util.jar.Attributes;
 import java.util.HashMap;
-
-import io.flutter.plugin.common.PluginRegistry;
+import java.util.Map;
 
 public class OptimoveInitProvider extends ContentProvider {
     private static final String TAG = OptimoveInitProvider.class.getName();
@@ -49,12 +41,13 @@ public class OptimoveInitProvider extends ContentProvider {
             e.printStackTrace();
             return true;
         }
+
         if (config == null) {
             Log.i(TAG, "Skipping init, no config file found...");
             return true;
         }
-        Application application = (Application) getContext().getApplicationContext();
-        Optimove.initialize(application, config.build());
+        
+        Optimove.initialize((Application) getContext().getApplicationContext(), config.build());
 
         return true;
     }
@@ -92,7 +85,7 @@ public class OptimoveInitProvider extends ContentProvider {
     private JsonReader getConfigReader() {
         String path = "flutter_assets" + File.separator + "optimove.json";
         AssetManager assetManager = getContext().getAssets();
-        InputStream is = null;
+        InputStream is;
         try {
             is = assetManager.open(path);
         } catch (IOException e) {
@@ -154,10 +147,9 @@ public class OptimoveInitProvider extends ContentProvider {
         }
 
         OptimoveConfig.Builder configBuilder = new OptimoveConfig.Builder(optimoveCredentials, optimobileCredentilas);
-
-//        if (inAppConsentStrategy != null) {
-//            configureInAppMessaging(configBuilder, inAppConsentStrategy);
-//        }
+        if (inAppConsentStrategy != null) {
+            configureInAppMessaging(configBuilder, inAppConsentStrategy);
+        }
         if (enableDeepLinking) {
             configureDeepLinking(configBuilder, deepLinkingCname);
         }
@@ -165,38 +157,13 @@ public class OptimoveInitProvider extends ContentProvider {
         return configBuilder;
     }
 
-//    private void configureInAppMessaging(@NonNull OptimoveConfig.Builder config, @NonNull String inAppConsentStrategy) {
-//        if (IN_APP_AUTO_ENROLL.equals(inAppConsentStrategy)) {
-//            config.enableInAppMessaging(KumulosConfig.InAppConsentStrategy.AUTO_ENROLL);
-//        } else if (IN_APP_EXPLICIT_BY_USER.equals(inAppConsentStrategy)) {
-//            config.enableInAppMessaging(KumulosConfig.InAppConsentStrategy.EXPLICIT_BY_USER);
-//        }
-//
-//        if (IN_APP_AUTO_ENROLL.equals(inAppConsentStrategy) || IN_APP_EXPLICIT_BY_USER.equals(inAppConsentStrategy)) {
-//            KumulosInApp.setDeepLinkHandler((context, data) -> {
-//                Map<String, Object> event = new HashMap<>(2);
-//                event.put("type", "in-app.deepLinkPressed");
-//                try {
-//                    event.put("data", JsonUtils.toMap(data));
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                    return;
-//                }
-//                KumulosSdkFlutterPlugin.eventSink.send(event);
-//            });
-//            KumulosInApp.setOnInboxUpdated(() -> {
-//                EventChannel.EventSink sink = KumulosSdkFlutterPlugin.inAppEventSink;
-//
-//                if (sink == null) {
-//                    return;
-//                }
-//
-//                Map<String, String> event = new HashMap<>(1);
-//                event.put("type", "inbox.updated");
-//                sink.success(event);
-//            });
-//        }
-//    }
+    private void configureInAppMessaging(@NonNull OptimoveConfig.Builder config, @NonNull String inAppConsentStrategy) {
+        if (IN_APP_AUTO_ENROLL.equals(inAppConsentStrategy)) {
+            config.enableInAppMessaging(OptimoveConfig.InAppConsentStrategy.AUTO_ENROLL);
+        } else if (IN_APP_EXPLICIT_BY_USER.equals(inAppConsentStrategy)) {
+            config.enableInAppMessaging(OptimoveConfig.InAppConsentStrategy.EXPLICIT_BY_USER);
+        }
+    }
 
     private void configureDeepLinking(@NonNull OptimoveConfig.Builder config, @Nullable String deepLinkingCname) {
         DeferredDeepLinkHandlerInterface handler = (context, resolution, link, data) -> {

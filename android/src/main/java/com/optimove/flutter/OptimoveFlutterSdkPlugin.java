@@ -29,7 +29,6 @@ public class OptimoveFlutterSdkPlugin implements FlutterPlugin, MethodCallHandle
   private MethodChannel channel;
   private EventChannel eventChannel;
   private EventChannel inAppEventChannel;
-  private Context context;
 
   static WeakReference<Activity> currentActivityRef = new WeakReference<>(null);
   static QueueingEventStreamHandler eventSink = new QueueingEventStreamHandler();
@@ -37,8 +36,6 @@ public class OptimoveFlutterSdkPlugin implements FlutterPlugin, MethodCallHandle
 
   @Override
   public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
-    context = flutterPluginBinding.getApplicationContext();
-
     channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "optimove_flutter_sdk");
     channel.setMethodCallHandler(this);
 
@@ -65,7 +62,6 @@ public class OptimoveFlutterSdkPlugin implements FlutterPlugin, MethodCallHandle
     eventChannel.setStreamHandler(null);
     eventSink.onCancel(null);
     inAppEventChannel.setStreamHandler(null);
-    context = null;
   }
 
   @Override
