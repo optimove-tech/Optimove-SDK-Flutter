@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import com.optimove.android.Optimove;
 import com.optimove.android.optimobile.Optimobile;
-import com.optimove.android.optimobile.PushActionHandlerInterface;
 import com.optimove.android.optimobile.PushBroadcastReceiver;
 import com.optimove.android.optimobile.PushMessage;
 import org.json.JSONException;
@@ -59,7 +58,7 @@ public class PushReceiver extends PushBroadcastReceiver {
     }
 
     @SuppressWarnings("unchecked")
-    private static void handlePushOpen(Context context, PushMessage pushMessage, String actionId) {
+    public static void handlePushOpen(Context context, PushMessage pushMessage, String actionId) {
         PushReceiver pr = new PushReceiver();
         Intent launchIntent = pr.getPushOpenActivityIntent(context, pushMessage);
 

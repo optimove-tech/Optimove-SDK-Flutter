@@ -56,9 +56,11 @@ class _MyAppState extends State<HomePage> {
         Text(push.message ?? 'No message'),
       ]);
     }, pushOpenedHandler: (push) {
-      _showAlert('Opened push', <Widget>[
+      _showAlert('Opened Push', <Widget>[
         Text(push.title ?? 'No title'),
         Text(push.message ?? 'No message'),
+        const Text(''),
+        Text('Action button tapped: ${push.actionId ?? 'none'}')
       ]);
     });
   }

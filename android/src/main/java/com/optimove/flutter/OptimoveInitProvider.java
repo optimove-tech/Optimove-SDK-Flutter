@@ -3,18 +3,23 @@ package com.optimove.flutter;
 import android.app.Application;
 import android.content.ContentProvider;
 import android.content.ContentValues;
+import android.content.Intent;
 import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.util.JsonReader;
 import android.util.JsonToken;
 import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
 import com.optimove.android.Optimove;
 import com.optimove.android.OptimoveConfig;
 import com.optimove.android.optimobile.DeferredDeepLinkHandlerInterface;
+
 import org.json.JSONException;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,6 +53,11 @@ public class OptimoveInitProvider extends ContentProvider {
         }
 
         Optimove.initialize((Application) getContext().getApplicationContext(), config.build());
+        Optimove.getInstance().setPushActionHandler((context, pushMessage, actionId) -> {
+            PushReceiver.handlePushOpen(context, pushMessage, actionId);
+            Intent it = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+            context.sendBroadcast(it);
+        });
 
         return true;
     }
