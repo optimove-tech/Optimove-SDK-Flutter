@@ -46,7 +46,7 @@ public class OptimoveInitProvider extends ContentProvider {
             Log.i(TAG, "Skipping init, no config file found...");
             return true;
         }
-        
+
         Optimove.initialize((Application) getContext().getApplicationContext(), config.build());
 
         return true;

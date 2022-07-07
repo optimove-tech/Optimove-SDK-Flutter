@@ -112,14 +112,4 @@ public class PushReceiver extends PushBroadcastReceiver {
         event.put("data", pushMessageToMap(pushMessage, actionId));
         OptimoveFlutterSdkPlugin.eventSink.send(event);
     }
-
-    static class PushActionHandler implements PushActionHandlerInterface {
-        @Override
-        public void handle(Context context, PushMessage pushMessage, String actionId) {
-            PushReceiver.handlePushOpen(context, pushMessage, actionId);
-
-            Intent it = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
-            context.sendBroadcast(it);
-        }
-    }
 }
