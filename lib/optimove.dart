@@ -94,7 +94,7 @@ class Optimove {
   }
 
   static void enableStagingRemoteLogs() {
-    if (Platform.isIOS) {
+    if (Platform.isAndroid) {
       _methodChannel.invokeMethod('enableStagingRemoteLogs');
     }
   }
