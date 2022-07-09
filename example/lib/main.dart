@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'package:flutter/services.dart';
+import 'dart:convert';
 import 'package:optimove_sdk_flutter/optimove.dart';
 
 void main() {
@@ -60,8 +60,26 @@ class _MyAppState extends State<HomePage> {
         Text(push.title ?? 'No title'),
         Text(push.message ?? 'No message'),
         const Text(''),
-        Text('Action button tapped: ${push.actionId ?? 'none'}')
+        Text('Action button tapped: ${push.actionId ?? 'none'}'),
+        const Text('Data:'),
+        Text(jsonEncode(push.data))
       ]);
+    }, deepLinkHandler: (outcome) {
+      var children = [
+        Text('Url: ${outcome.url}'),
+        Text('Resolved: ${outcome.resolution}')
+      ];
+
+      if (outcome.resolution == OptimoveDeepLinkResolution.LinkMatched) {
+        children.addAll([
+          Text('Link title: ${outcome.content?.title}'),
+          Text('Link description: ${outcome.content?.description}'),
+          const Text('Link data:'),
+          Text(jsonEncode(outcome.linkData))
+        ]);
+      }
+
+      _showAlert('Kumulos Deep Link', children);
     });
   }
   Future<void> getIdentifiers() async {

@@ -21,6 +21,43 @@ class OptimovePushNotification {
         actionId = map['actionId'];
 }
 
+
+enum OptimoveDeepLinkResolution {
+  LookupFailed,
+  LinkNotFound,
+  LinkExpired,
+  LimitExceeded,
+  LinkMatched
+}
+
+class OptimoveDeepLinkContent {
+  final String? title;
+  final String? description;
+
+  OptimoveDeepLinkContent(this.title, this.description);
+}
+
+class OptimoveDeepLinkOutcome {
+  final OptimoveDeepLinkResolution resolution;
+  final String url;
+  final OptimoveDeepLinkContent? content;
+  final Map<String, dynamic>? linkData;
+
+  OptimoveDeepLinkOutcome(
+      this.resolution, this.url, this.content, this.linkData);
+
+  OptimoveDeepLinkOutcome.fromMap(Map<String, dynamic> map)
+      : resolution = OptimoveDeepLinkResolution.values[map['resolution']],
+        url = map['url'],
+        content = map['link']['content'] != null
+            ? OptimoveDeepLinkContent(map['link']['content']['title'],
+            map['link']['content']['description'])
+            : null,
+        linkData = map['link']['data'] != null
+            ? Map<String, dynamic>.from(map['link']['data'])
+            : null;
+}
+
 class Optimove {
   static const MethodChannel _methodChannel = MethodChannel('optimove_flutter_sdk');
   static const EventChannel _eventChannel = EventChannel('optimove_flutter_sdk_events');
@@ -28,10 +65,13 @@ class Optimove {
 
   static void Function(OptimovePushNotification)? _pushOpenedHandler;
   static void Function(OptimovePushNotification)? _pushReceivedHandler;
+  static void Function(OptimoveDeepLinkOutcome)? _deepLinkHandler;
 
-  static void setEventHandlers({void Function(OptimovePushNotification)? pushReceivedHandler, void Function(OptimovePushNotification)? pushOpenedHandler}){
+  static void setEventHandlers({void Function(OptimovePushNotification)? pushReceivedHandler,
+    void Function(OptimovePushNotification)? pushOpenedHandler, void Function(OptimoveDeepLinkOutcome)? deepLinkHandler}){
     _pushOpenedHandler = pushOpenedHandler;
     _pushReceivedHandler = pushReceivedHandler;
+    _deepLinkHandler = deepLinkHandler;
     if (pushOpenedHandler == null && pushReceivedHandler == null) {
       _eventStream?.cancel();
       _eventStream = null;
@@ -52,6 +92,9 @@ class Optimove {
           return;
         case 'push.received':
           _pushReceivedHandler?.call(OptimovePushNotification.fromMap(data));
+          return;
+        case 'deep-linking.linkResolved':
+          _deepLinkHandler?.call(OptimoveDeepLinkOutcome.fromMap(data));
           return;
       }
     });
