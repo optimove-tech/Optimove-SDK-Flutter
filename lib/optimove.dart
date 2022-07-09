@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
+import 'dart:io' show Platform;
 
 class OptimovePushNotification {
   final String? title;
@@ -86,7 +87,15 @@ class Optimove {
     return userIdentifier;
   }
 
-  static Future<void> pushRequestDeviceToken() {
-    return _methodChannel.invokeMethod('pushRequestDeviceToken');
+  static void pushRequestDeviceToken() {
+    if (Platform.isIOS){
+      _methodChannel.invokeMethod('pushRequestDeviceToken');
+    }
+  }
+
+  static void enableStagingRemoteLogs() {
+    if (Platform.isIOS) {
+      _methodChannel.invokeMethod('enableStagingRemoteLogs');
+    }
   }
 }

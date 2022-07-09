@@ -108,6 +108,10 @@ public class OptimoveFlutterSdkPlugin implements FlutterPlugin, MethodCallHandle
       case "getCurrentUserIdentifier":
         handleGetCurrentUserIdentifier(result);
         break;
+      case "enableStagingRemoteLogs":
+        Optimove.enableStagingRemoteLogs();
+        result.success(null);
+        break;
       default: result.notImplemented();
     }
   }
