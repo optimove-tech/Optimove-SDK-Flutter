@@ -42,7 +42,7 @@ public class SwiftOptimoveFlutterSdkPlugin: NSObject, FlutterPlugin, FlutterStre
         }
     }
     
-    fileprivate func initOptimove(registrar: FlutterPluginRegistrar) {
+    private func initOptimove(registrar: FlutterPluginRegistrar) {
         //crash the app if the keys are not found
         let topPath = Bundle.main.path(forResource: registrar.lookupKey(forAsset: "optimove.json"), ofType: nil)!
         let jsonData = try! String(contentsOfFile: topPath).data(using: .utf8)
@@ -50,26 +50,44 @@ public class SwiftOptimoveFlutterSdkPlugin: NSObject, FlutterPlugin, FlutterStre
         
         let flutterEventChannel: FlutterEventChannel = FlutterEventChannel(name: "optimove_flutter_sdk_events", binaryMessenger: registrar.messenger())
         flutterEventChannel.setStreamHandler(self)
-        
+        self.initOptimove(from: optimoveKeys)
+    }
+    
+    private func initOptimove(from optimoveKeys: OptimoveKeys){
         let config = OptimoveConfigBuilder(optimoveCredentials: optimoveKeys.optimoveCredentials, optimobileCredentials: optimoveKeys.optimobileCredentials)
-                    .enableDeepLinking({ deepLinkResolution in
-                                    let center = NotificationCenter.default
-                                    let deepLinkDict = ["DeepLink" : deepLinkResolution]
-                                    center.post(name: NSNotification.Name(rawValue: "DeepLinking"), object: nil, userInfo: deepLinkDict)
-                                })
-                                .setPushReceivedInForegroundHandler(pushReceivedInForegroundHandlerBlock: { notification , UNNotificationPresentationOptions -> Void in
-                                    self.emitPushNotificationReceivedEvent(pushNotification: notification)
-                                })
-                                .setPushOpenedHandler(pushOpenedHandlerBlock: { notification in
-                                    self.emitPushNotificationOpenedEvent(pushNotification: notification)
-                                })
-                                .enableInAppMessaging(inAppConsentStrategy: optimoveKeys.inAppConsentStrategy == "auto-enroll" ? .autoEnroll : .explicitByUser)
-                                .setInAppDeepLinkHandler(inAppDeepLinkHandlerBlock: { inAppButtonPress in
-                                    print("In app deeplink handler")
-                                })
-                                .build()
+        
+        if (optimoveKeys.enableDeferredDeepLinking) {
+            let dlHandler: DeepLinkHandler = { deepLinkResolution in
+                let center = NotificationCenter.default
+                let deepLinkDict = ["DeepLink" : deepLinkResolution]
+                center.post(name: NSNotification.Name(rawValue: "DeepLinking"), object: nil, userInfo: deepLinkDict)
+            }
+            if let cname = optimoveKeys.cname {
+                config.enableDeepLinking(cname: cname, dlHandler)
+            } else {
+                config.enableDeepLinking(dlHandler)
+            }
+        }
+        
+        if #available(iOS 10, *) {
+            config.setPushReceivedInForegroundHandler(pushReceivedInForegroundHandlerBlock: { notification , UNNotificationPresentationOptions -> Void in
+                self.emitPushNotificationReceivedEvent(pushNotification: notification)
+            })
+        }
+        
+        config.setPushOpenedHandler(pushOpenedHandlerBlock: { notification in
+            self.emitPushNotificationOpenedEvent(pushNotification: notification)
+        })
+        
+        if optimoveKeys.inAppConsentStrategy != .disabled {
+            config.enableInAppMessaging(inAppConsentStrategy: optimoveKeys.inAppConsentStrategy == .autoEnroll ? .autoEnroll : .explicitByUser)
+        }
+        
+        config.setInAppDeepLinkHandler(inAppDeepLinkHandlerBlock: { inAppButtonPress in
+            print("In app deeplink handler")
+        })
 
-        Optimove.initialize(with: config)
+        Optimove.initialize(with: config.build())
     }
     
     private func emitPushNotificationReceivedEvent(pushNotification: PushNotification){
@@ -126,10 +144,46 @@ public class SwiftOptimoveFlutterSdkPlugin: NSObject, FlutterPlugin, FlutterStre
         return nil
     }
 }
+        
+enum InAppConsentStrategy: String {
+    case autoEnroll = "auto-enroll"
+    case explicitByUser = "explicit-by-user"
+    case disabled = "in-app-disabled"
+}
 
-struct OptimoveKeys: Codable {
+class OptimoveKeys: Decodable {
     let optimoveCredentials: String
     let optimobileCredentials: String
-    var inAppConsentStrategy: String?
-    var enableDeferredDeepLinking: Bool?
+    var inAppConsentStrategy: InAppConsentStrategy
+    var enableDeferredDeepLinking: Bool
+    var cname: String?
+    
+    enum CodingKeys: CodingKey {
+        case optimoveCredentials, optimobileCredentials, inAppConsentStrategy, enableDeferredDeepLinking
+    }
+    
+    required init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        optimoveCredentials = try container.decode(String.self, forKey: .optimoveCredentials)
+        optimobileCredentials = try container.decode(String.self, forKey: .optimobileCredentials)
+        let inAppConsentStrategyString: String? = try? container.decode(String.self, forKey: .inAppConsentStrategy)
+        
+        switch inAppConsentStrategyString {
+        case InAppConsentStrategy.explicitByUser.rawValue:
+            inAppConsentStrategy = .explicitByUser
+        case InAppConsentStrategy.autoEnroll.rawValue:
+            inAppConsentStrategy = .autoEnroll
+        default:
+            inAppConsentStrategy = .disabled
+        }
+        
+        if let enableDeferredDeepLinkingBoolean = try? container.decode(Bool.self, forKey: .enableDeferredDeepLinking) {
+            enableDeferredDeepLinking = enableDeferredDeepLinkingBoolean
+        } else if let enableDeferredDeepLinkingString = try? container.decode(String.self, forKey: .enableDeferredDeepLinking) {
+            enableDeferredDeepLinking = true
+            cname = enableDeferredDeepLinkingString
+        } else {
+            enableDeferredDeepLinking = false
+        }
+    }
 }
