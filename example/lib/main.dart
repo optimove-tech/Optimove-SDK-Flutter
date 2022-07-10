@@ -113,13 +113,7 @@ class _MyAppState extends State<HomePage> {
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
           child: SingleChildScrollView(
             child: Column(
-              children: [_userInfoSection(), _getUserIdentitySection(), const SizedBox(height: 8), _getScreenVisitSection(), const SizedBox(height: 8), _getReportEventSection(),
-                ElevatedButton(
-                  style: _getButtonStyle(),
-                  onPressed: () {
-                    Optimove.pushRequestDeviceToken();
-                  },
-                  child: const Text("Set user id")) ],
+              children: [_userInfoSection(), _getUserIdentitySection(),const SizedBox(height: 8), _getPushSection(), const SizedBox(height: 8),_getReportEventSection(),const SizedBox(height: 8), _getScreenVisitSection()],
             ),
           ),
         ),
@@ -133,6 +127,7 @@ class _MyAppState extends State<HomePage> {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Container(alignment: Alignment.centerLeft, child: Text("Current user id: $optimobileIdentifier")),
             const SizedBox(height: 8),
@@ -149,6 +144,7 @@ class _MyAppState extends State<HomePage> {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             TextField(
                 controller: userIdTextController,
@@ -193,6 +189,7 @@ class _MyAppState extends State<HomePage> {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             TextField(
                 controller: pageTitleTextController,
@@ -220,12 +217,33 @@ class _MyAppState extends State<HomePage> {
     );
   }
 
+  Widget _getPushSection() {
+    return Card(
+      color: const Color.fromARGB(255, 167, 184, 204),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            ElevatedButton(
+                style: _getButtonStyle(),
+                onPressed: () {
+                  Optimove.pushRequestDeviceToken();
+                },
+                child: const Text("Request device token")),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _getReportEventSection() {
     return Card(
       color: const Color.fromARGB(255, 167, 184, 204),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             TextField(
                 controller: eventNameTextController,
