@@ -39,3 +39,8 @@ post_install do |installer|
     flutter_additional_ios_build_settings(target)
   end
 end
+
+target 'NotificationServiceExtension' do
+  use_frameworks!
+  pod 'KumulosSdkObjectiveCExtension', '4.6.0'
+end

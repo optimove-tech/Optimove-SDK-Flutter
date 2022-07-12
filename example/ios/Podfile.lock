@@ -1,5 +1,6 @@
 PODS:
   - Flutter (1.0.0)
+  - KumulosSdkObjectiveCExtension (4.6.0)
   - optimove_sdk_flutter (0.0.1):
     - Flutter
     - OptimoveCore (= 5.0.0)
@@ -10,10 +11,12 @@ PODS:
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
+  - KumulosSdkObjectiveCExtension (= 4.6.0)
   - optimove_sdk_flutter (from `.symlinks/plugins/optimove_sdk_flutter/ios`)
 
 SPEC REPOS:
   trunk:
+    - KumulosSdkObjectiveCExtension
     - OptimoveCore
     - OptimoveSDK
 
@@ -25,10 +28,11 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
+  KumulosSdkObjectiveCExtension: 40d02298153f243d02c83116421a44a06154cc8f
   optimove_sdk_flutter: 7466a639a158a2807fedcd4ee69fd126f5164738
   OptimoveCore: d847048dba52605a24dc0f7f02e3622edbbdfe3f
   OptimoveSDK: 3b80312856e3909949ccad83e4064e111182040a
 
-PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
+PODFILE CHECKSUM: 564c72c9fae45bbc2ec38861c92f09fa5761086f
 
 COCOAPODS: 1.10.0
