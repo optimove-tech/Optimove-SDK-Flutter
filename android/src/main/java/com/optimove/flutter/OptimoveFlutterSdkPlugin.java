@@ -5,9 +5,12 @@ import android.app.Activity;
 import androidx.annotation.NonNull;
 
 import com.optimove.android.Optimove;
+import com.optimove.android.optimobile.Optimobile;
+import com.optimove.android.optimobile.OptimoveInApp;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
@@ -111,6 +114,17 @@ public class OptimoveFlutterSdkPlugin implements FlutterPlugin, MethodCallHandle
       case "enableStagingRemoteLogs":
         Optimove.enableStagingRemoteLogs();
         result.success(null);
+        break;
+      case "inAppMarkAllInboxItemsAsRead":
+        result.succes(OptimoveInApp.getInstance().markAllInboxItemsAsRead());
+        break;
+      case "getInboxSummary":
+        OptimoveInApp.getInstance().getInboxSummaryAsync(summary -> {
+          Map<String, Object> summaryMap = new HashMap<>(2);
+          summaryMap.put("totalCount", summary.getTotalCount());
+          summaryMap.put("unreadCount", summary.getUnreadCount());
+          result.success(summaryMap);
+        });
         break;
       default: result.notImplemented();
     }

@@ -37,6 +37,12 @@ public class SwiftOptimoveFlutterSdkPlugin: NSObject, FlutterPlugin, FlutterStre
             case "pushRequestDeviceToken":
               Optimove.shared.pushRequestDeviceToken()
               result(nil)
+            case "inAppMarkAllInboxItemsAsRead":
+              result(OptimoveInApp.markAllInboxItemsAsRead());
+            case "getInboxSummary":
+              OptimoveInApp.getInboxSummaryAsync(inboxSummaryBlock: { inAppInboxSummary in
+                  result(inAppInboxSummary)
+              })
             default:
               result(nil)
         }

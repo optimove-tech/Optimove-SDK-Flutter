@@ -2,62 +2,6 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'dart:io' show Platform;
 
-class OptimovePushNotification {
-  final String? title;
-  final String? message;
-  final Map<String, dynamic>? data;
-  final String? url;
-  final String? actionId;
-
-  OptimovePushNotification(
-      this.title, this.message, this.data, this.url, this.actionId);
-
-  OptimovePushNotification.fromMap(Map<String, dynamic> map)
-      : title = map['title'],
-        message = map['message'],
-        data =
-        map['data'] != null ? Map<String, dynamic>.from(map['data']) : null,
-        url = map['url'],
-        actionId = map['actionId'];
-}
-
-
-enum OptimoveDeepLinkResolution {
-  LookupFailed,
-  LinkNotFound,
-  LinkExpired,
-  LimitExceeded,
-  LinkMatched
-}
-
-class OptimoveDeepLinkContent {
-  final String? title;
-  final String? description;
-
-  OptimoveDeepLinkContent(this.title, this.description);
-}
-
-class OptimoveDeepLinkOutcome {
-  final OptimoveDeepLinkResolution resolution;
-  final String url;
-  final OptimoveDeepLinkContent? content;
-  final Map<String, dynamic>? linkData;
-
-  OptimoveDeepLinkOutcome(
-      this.resolution, this.url, this.content, this.linkData);
-
-  OptimoveDeepLinkOutcome.fromMap(Map<String, dynamic> map)
-      : resolution = OptimoveDeepLinkResolution.values[map['resolution']],
-        url = map['url'],
-        content = map['link']['content'] != null
-            ? OptimoveDeepLinkContent(map['link']['content']['title'],
-            map['link']['content']['description'])
-            : null,
-        linkData = map['link']['data'] != null
-            ? Map<String, dynamic>.from(map['link']['data'])
-            : null;
-}
-
 class Optimove {
   static const MethodChannel _methodChannel = MethodChannel('optimove_flutter_sdk');
   static const EventChannel _eventChannel = EventChannel('optimove_flutter_sdk_events');
@@ -141,4 +85,83 @@ class Optimove {
       _methodChannel.invokeMethod('enableStagingRemoteLogs');
     }
   }
+
+  static Future<bool> markAllInboxItemsAsRead() async {
+    var result = await _methodChannel.invokeMethod<bool>('inAppMarkAllInboxItemsAsRead');
+
+    return result ?? false;
+  }
+
+  static Future<OptimoveInAppInboxSummary?> getInboxSummary() async {
+    Map<String, dynamic> result = Map<String, dynamic>.from(await _methodChannel.invokeMethod('inAppGetInboxSummary'));
+
+    return OptimoveInAppInboxSummary(
+        result['totalCount'], result['unreadCount']);
+  }
+
 }
+
+class OptimoveInAppInboxSummary {
+  final int totalCount;
+  final int unreadCount;
+
+  OptimoveInAppInboxSummary(this.totalCount, this.unreadCount);
+}
+
+
+class OptimovePushNotification {
+  final String? title;
+  final String? message;
+  final Map<String, dynamic>? data;
+  final String? url;
+  final String? actionId;
+
+  OptimovePushNotification(
+      this.title, this.message, this.data, this.url, this.actionId);
+
+  OptimovePushNotification.fromMap(Map<String, dynamic> map)
+      : title = map['title'],
+        message = map['message'],
+        data =
+        map['data'] != null ? Map<String, dynamic>.from(map['data']) : null,
+        url = map['url'],
+        actionId = map['actionId'];
+}
+
+
+enum OptimoveDeepLinkResolution {
+  LookupFailed,
+  LinkNotFound,
+  LinkExpired,
+  LimitExceeded,
+  LinkMatched
+}
+
+class OptimoveDeepLinkContent {
+  final String? title;
+  final String? description;
+
+  OptimoveDeepLinkContent(this.title, this.description);
+}
+
+class OptimoveDeepLinkOutcome {
+  final OptimoveDeepLinkResolution resolution;
+  final String url;
+  final OptimoveDeepLinkContent? content;
+  final Map<String, dynamic>? linkData;
+
+  OptimoveDeepLinkOutcome(
+      this.resolution, this.url, this.content, this.linkData);
+
+  OptimoveDeepLinkOutcome.fromMap(Map<String, dynamic> map)
+      : resolution = OptimoveDeepLinkResolution.values[map['resolution']],
+        url = map['url'],
+        content = map['link']['content'] != null
+            ? OptimoveDeepLinkContent(map['link']['content']['title'],
+            map['link']['content']['description'])
+            : null,
+        linkData = map['link']['data'] != null
+            ? Map<String, dynamic>.from(map['link']['data'])
+            : null;
+}
+
