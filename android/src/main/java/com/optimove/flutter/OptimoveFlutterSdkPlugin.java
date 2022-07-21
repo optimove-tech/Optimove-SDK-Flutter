@@ -126,6 +126,10 @@ public class OptimoveFlutterSdkPlugin implements FlutterPlugin, MethodCallHandle
           result.success(summaryMap);
         });
         break;
+      case "inAppUpdateConsent":
+        OptimoveInApp.getInstance().updateConsentForUser(call.arguments());
+        result.success(null);
+        break;
       default: result.notImplemented();
     }
   }

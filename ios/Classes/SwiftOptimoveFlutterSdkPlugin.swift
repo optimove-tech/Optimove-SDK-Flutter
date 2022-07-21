@@ -43,6 +43,9 @@ public class SwiftOptimoveFlutterSdkPlugin: NSObject, FlutterPlugin, FlutterStre
               OptimoveInApp.getInboxSummaryAsync(inboxSummaryBlock: { inAppInboxSummary in
                   result(inAppInboxSummary)
               })
+            case "inAppUpdateConsent":
+              OptimoveInApp.updateConsent(forUser: call.arguments as! Bool)
+              result(nil)
             default:
               result(nil)
         }
