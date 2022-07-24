@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:optimove_sdk_flutter/optimove.dart';
+
+import 'inbox.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -49,13 +52,8 @@ class _MyAppState extends State<HomePage> {
     eventNameTextController = TextEditingController();
   }
 
-  Future<void> initListeners()async{
-    Optimove.setEventHandlers(pushReceivedHandler: (push) {
-      _showAlert('Received Push', <Widget>[
-        Text(push.title ?? 'No title'),
-        Text(push.message ?? 'No message'),
-      ]);
-    }, pushOpenedHandler: (push) {
+  Future<void> initListeners() async {
+    Optimove.setPushOpenedHandler((push) {
       _showAlert('Opened Push', <Widget>[
         Text(push.title ?? 'No title'),
         Text(push.message ?? 'No message'),
@@ -64,7 +62,16 @@ class _MyAppState extends State<HomePage> {
         const Text('Data:'),
         Text(jsonEncode(push.data))
       ]);
-    }, deepLinkHandler: (outcome) {
+    });
+
+    Optimove.setPushReceivedHandler((push) {
+      _showAlert('Received Push', <Widget>[
+        Text(push.title ?? 'No title'),
+        Text(push.message ?? 'No message'),
+      ]);
+    });
+
+    Optimove.setDeeplinkHandler((outcome) {
       var children = [
         Text('Url: ${outcome.url}'),
         Text('Resolved: ${outcome.resolution}')
@@ -79,7 +86,7 @@ class _MyAppState extends State<HomePage> {
         ]);
       }
 
-      _showAlert('Kumulos Deep Link', children);
+      _showAlert('Optimove Deep Link', children);
     });
   }
   Future<void> getIdentifiers() async {
@@ -113,7 +120,7 @@ class _MyAppState extends State<HomePage> {
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
           child: SingleChildScrollView(
             child: Column(
-              children: [_userInfoSection(), _getUserIdentitySection(),const SizedBox(height: 8), _getPushSection(), const SizedBox(height: 8),_getReportEventSection(),const SizedBox(height: 8), _getScreenVisitSection()],
+              children: [_userInfoSection(), _getUserIdentitySection(),const SizedBox(height: 8), _getPushSection(), const SizedBox(height: 8),_getReportEventSection(),const SizedBox(height: 8), _getScreenVisitSection(), const SizedBox(height: 8), _getInAppSection()],
             ),
           ),
         ),
@@ -211,6 +218,53 @@ class _MyAppState extends State<HomePage> {
                   }
                 },
                 child: const Text("Report screen visit")),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _getInAppSection() {
+    return Card(
+      color: const Color.fromARGB(255, 167, 184, 204),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            ElevatedButton(
+                style: _getButtonStyle(),
+                onPressed: () async {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => Inbox()));
+                },
+                child: const Text('Inbox')),
+            ElevatedButton(
+                style: _getButtonStyle(),
+                onPressed: () async {
+                  var summary = await Optimove.getInboxSummary();
+                  _showAlert('In-app inbox summary', [
+                    Text(
+                        'Total: ${summary?.totalCount} Unread: ${summary?.unreadCount}')
+                  ]);
+                },
+                child: const Text('In-app inbox summary')),
+            ElevatedButton(
+                style: _getButtonStyle(),
+                onPressed: () async {
+                  await Optimove.updateConsentForUser(true);
+                  _showAlert('In-app consent',
+                      [const Text('Opted in to in-app messaging')]);
+                },
+                child: const Text('Opt in')),
+            ElevatedButton(
+                style: _getButtonStyle(),
+                onPressed: () async {
+                  await Optimove.updateConsentForUser(false);
+                  _showAlert('In-app consent',
+                      [const Text('Opted out from in-app messaging')]);
+                },
+                child: const Text('Opt out')),
           ],
         ),
       ),

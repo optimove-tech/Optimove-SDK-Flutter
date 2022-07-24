@@ -5,13 +5,19 @@ import android.app.Activity;
 import androidx.annotation.NonNull;
 
 import com.optimove.android.Optimove;
+import com.optimove.android.optimobile.InAppInboxItem;
 import com.optimove.android.optimobile.Optimobile;
 import com.optimove.android.optimobile.OptimoveInApp;
 
 import java.lang.ref.WeakReference;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
@@ -30,11 +36,9 @@ public class OptimoveFlutterSdkPlugin implements FlutterPlugin, MethodCallHandle
   /// when the Flutter Engine is detached from the Activity
   private MethodChannel channel;
   private EventChannel eventChannel;
-  private EventChannel inAppEventChannel;
 
   static WeakReference<Activity> currentActivityRef = new WeakReference<>(null);
   static QueueingEventStreamHandler eventSink = new QueueingEventStreamHandler();
-  static EventChannel.EventSink inAppEventSink;
 
   @Override
   public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
@@ -43,19 +47,6 @@ public class OptimoveFlutterSdkPlugin implements FlutterPlugin, MethodCallHandle
 
     eventChannel = new EventChannel(flutterPluginBinding.getBinaryMessenger(), "optimove_flutter_sdk_events");
     eventChannel.setStreamHandler(eventSink);
-
-    inAppEventChannel = new EventChannel(flutterPluginBinding.getBinaryMessenger(), "optimove_flutter_sdk_events_in_app");
-    inAppEventChannel.setStreamHandler(new EventChannel.StreamHandler() {
-      @Override
-      public void onListen(Object arguments, EventChannel.EventSink eventSink) {
-        inAppEventSink = eventSink;
-      }
-
-      @Override
-      public void onCancel(Object arguments) {
-        inAppEventSink = null;
-      }
-    });
   }
 
   @Override
@@ -63,7 +54,6 @@ public class OptimoveFlutterSdkPlugin implements FlutterPlugin, MethodCallHandle
     channel.setMethodCallHandler(null);
     eventChannel.setStreamHandler(null);
     eventSink.onCancel(null);
-    inAppEventChannel.setStreamHandler(null);
   }
 
   @Override
@@ -116,9 +106,12 @@ public class OptimoveFlutterSdkPlugin implements FlutterPlugin, MethodCallHandle
         result.success(null);
         break;
       case "inAppMarkAllInboxItemsAsRead":
-        result.succes(OptimoveInApp.getInstance().markAllInboxItemsAsRead());
+        result.success(OptimoveInApp.getInstance().markAllInboxItemsAsRead());
         break;
-      case "getInboxSummary":
+      case "inAppMarkAsRead":
+        markAsRead(call, result);
+        break;
+      case "inAppGetInboxSummary":
         OptimoveInApp.getInstance().getInboxSummaryAsync(summary -> {
           Map<String, Object> summaryMap = new HashMap<>(2);
           summaryMap.put("totalCount", summary.getTotalCount());
@@ -127,10 +120,71 @@ public class OptimoveFlutterSdkPlugin implements FlutterPlugin, MethodCallHandle
         });
         break;
       case "inAppUpdateConsent":
-        OptimoveInApp.getInstance().updateConsentForUser(call.arguments());
+        OptimoveInApp.getInstance().updateConsentForUser(call.argument("consentGiven"));
         result.success(null);
         break;
+      case "inAppGetInboxItems":
+        getInboxItems(result);
+        break;
+      case "inAppPresentInboxMessage":
+        presentInAppMessage(call, result);
+        break;
+      case "inAppDeleteMessageFromInbox":
+        deleteInboxItem(call, result);
+        break;
       default: result.notImplemented();
+    }
+  }
+
+  private void markAsRead(@NonNull MethodCall call, @NonNull Result result) {
+    int id = call.argument("id");
+    boolean marked = false;
+    List<InAppInboxItem> items = OptimoveInApp.getInstance().getInboxItems();
+    for (InAppInboxItem item : items) {
+      if (id == item.getId()) {
+        marked = OptimoveInApp.getInstance().mark=AsRead(item);
+        break;
+      }
+    }
+    result.success(marked);
+  }
+
+  private void deleteInboxItem(@NonNull MethodCall call, @NonNull Result result) {
+    int id = call.argument("id");
+    boolean deleted = false;
+    List<InAppInboxItem> items = OptimoveInApp.getInstance().getInboxItems();
+    for (InAppInboxItem item : items) {
+      if (id == item.getId()) {
+        deleted = OptimoveInApp.getInstance().deleteMessageFromInbox(item);
+        break;
+      }
+    }
+    result.success(deleted);
+  }
+
+  private void presentInAppMessage(@NonNull MethodCall call, @NonNull Result result) {
+    int id = call.argument("id");
+    OptimoveInApp.InboxMessagePresentationResult presentationResult =
+            OptimoveInApp.InboxMessagePresentationResult.FAILED;
+    List<InAppInboxItem> items = OptimoveInApp.getInstance().getInboxItems();
+    for (InAppInboxItem item :
+            items) {
+      if (item.getId() == id) {
+        presentationResult = OptimoveInApp.getInstance().presentInboxMessage(item);
+        break;
+      }
+    }
+    // Map the enum ordinals into the order expected in the dart side (matches ObjC)
+    switch (presentationResult) {
+      case PRESENTED:
+        result.success(0);
+        break;
+      case FAILED_EXPIRED:
+        result.success(1);
+        break;
+      default:
+        result.success(2);
+        break;
     }
   }
 
@@ -185,6 +239,50 @@ public class OptimoveFlutterSdkPlugin implements FlutterPlugin, MethodCallHandle
     result.success(null);
   }
 
+  private void getInboxItems(@NonNull Result result) {
+    SimpleDateFormat formatter;
+    formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
+    formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+    List<InAppInboxItem> inboxItems = OptimoveInApp.getInstance().getInboxItems();
+    List<Map<String, Object>> results = new ArrayList<>(inboxItems.size());
+    for (InAppInboxItem item : inboxItems) {
+      Map<String, Object> mapped = new HashMap<>(10);
+      mapped.put("id", item.getId());
+      mapped.put("title", item.getTitle());
+      mapped.put("subtitle", item.getSubtitle());
+      mapped.put("sentAt", formatter.format(item.getSentAt()));
+      mapped.put("isRead", item.isRead());
+      mapped.put("data", item.getData());
+      mapped.put("imageUrl", item.getImageUrl() != null ? item.getImageUrl().toString() : null);
+
+      Date availableFrom = item.getAvailableFrom();
+      Date availableTo = item.getAvailableTo();
+      Date dismissedAt = item.getDismissedAt();
+
+      if (null == availableFrom) {
+        mapped.put("availableFrom", null);
+      } else {
+        mapped.put("availableFrom", formatter.format(availableFrom));
+      }
+
+      if (null == availableTo) {
+        mapped.put("availableTo", null);
+      } else {
+        mapped.put("availableTo", formatter.format(availableTo));
+      }
+
+      if (null == dismissedAt) {
+        mapped.put("dismissedAt", null);
+      } else {
+        mapped.put("dismissedAt", formatter.format(dismissedAt));
+      }
+
+      results.add(mapped);
+    }
+    result.success(results);
+  }
+
   /**
    * package
    */
@@ -229,6 +327,7 @@ public class OptimoveFlutterSdkPlugin implements FlutterPlugin, MethodCallHandle
       eventSink.success(event);
     }
   }
+
 }
 
 

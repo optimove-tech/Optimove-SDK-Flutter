@@ -3,7 +3,6 @@ package com.optimove.flutter;
 import android.app.Application;
 import android.content.ContentProvider;
 import android.content.ContentValues;
-import android.content.Intent;
 import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -17,6 +16,7 @@ import androidx.annotation.Nullable;
 import com.optimove.android.Optimove;
 import com.optimove.android.OptimoveConfig;
 import com.optimove.android.optimobile.DeferredDeepLinkHandlerInterface;
+import com.optimove.android.optimobile.OptimoveInApp;
 
 import org.json.JSONException;
 
@@ -27,6 +27,8 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.optimove.flutter.OptimoveFlutterSdkPlugin.eventSink;
 
 public class OptimoveInitProvider extends ContentProvider {
     private static final String TAG = OptimoveInitProvider.class.getName();
@@ -53,11 +55,7 @@ public class OptimoveInitProvider extends ContentProvider {
         }
 
         Optimove.initialize((Application) getContext().getApplicationContext(), config.build());
-        Optimove.getInstance().setPushActionHandler((context, pushMessage, actionId) -> {
-            PushReceiver.handlePushOpen(context, pushMessage, actionId);
-            Intent it = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
-            context.sendBroadcast(it);
-        });
+        setAdditionalListeners();
 
         return true;
     }
@@ -168,15 +166,46 @@ public class OptimoveInitProvider extends ContentProvider {
     }
 
     private void configureInAppMessaging(@NonNull OptimoveConfig.Builder config, @NonNull String inAppConsentStrategy) {
-        if (IN_APP_AUTO_ENROLL.equals(inAppConsentStrategy)) {
-            config.enableInAppMessaging(OptimoveConfig.InAppConsentStrategy.AUTO_ENROLL);
-        } else if (IN_APP_EXPLICIT_BY_USER.equals(inAppConsentStrategy)) {
-            config.enableInAppMessaging(OptimoveConfig.InAppConsentStrategy.EXPLICIT_BY_USER);
+        switch (inAppConsentStrategy) {
+            case IN_APP_AUTO_ENROLL:
+                config.enableInAppMessaging(OptimoveConfig.InAppConsentStrategy.AUTO_ENROLL);
+                break;
+            case IN_APP_EXPLICIT_BY_USER:
+                config.enableInAppMessaging(OptimoveConfig.InAppConsentStrategy.EXPLICIT_BY_USER);
+                break;
         }
     }
 
+    private void setAdditionalListeners(){
+        Optimove.getInstance().setPushActionHandler(PushReceiver::handlePushOpen);
+
+        OptimoveInApp.getInstance().setOnInboxUpdated(() -> {
+            Map<String, String> event = new HashMap<>(1);
+            event.put("type", "inbox.updated");
+            eventSink.send(event);
+        });
+
+        OptimoveInApp.getInstance().setDeepLinkHandler((context, data) -> {
+            Map<String, Object> event = new HashMap<>(2);
+            event.put("type", "in-app.deepLinkPressed");
+            event.put("data", data);
+            eventSink.send(event);
+        });
+    }
+
     private void configureDeepLinking(@NonNull OptimoveConfig.Builder config, @Nullable String deepLinkingCname) {
-        DeferredDeepLinkHandlerInterface handler = (context, resolution, link, data) -> {
+        DeferredDeepLinkHandlerInterface deferredDeepLinkHandlerInterface = getDDLHandlerInterface();
+
+        if (deepLinkingCname != null) {
+            config.enableDeepLinking(deepLinkingCname, deferredDeepLinkHandlerInterface);
+
+            return;
+        }
+        config.enableDeepLinking(deferredDeepLinkHandlerInterface);
+    }
+
+    private DeferredDeepLinkHandlerInterface getDDLHandlerInterface(){
+        return (context, resolution, link, data) -> {
             Map<String, Object> linkMap = null;
             if (null != data) {
                 linkMap = new HashMap<>(2);
@@ -203,14 +232,9 @@ public class OptimoveInitProvider extends ContentProvider {
             event.put("type", "deep-linking.linkResolved");
             event.put("data", eventData);
 
-            OptimoveFlutterSdkPlugin.eventSink.send(event);
+            eventSink.send(event);
         };
-
-        if (deepLinkingCname != null) {
-            config.enableDeepLinking(deepLinkingCname, handler);
-        } else {
-            config.enableDeepLinking(handler);
-        }
     }
+
 }
 

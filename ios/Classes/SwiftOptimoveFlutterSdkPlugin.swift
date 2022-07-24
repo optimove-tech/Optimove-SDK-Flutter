@@ -3,16 +3,69 @@ import UIKit
 import OptimoveSDK
 
 public class SwiftOptimoveFlutterSdkPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
-
+    
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "optimove_flutter_sdk", binaryMessenger: registrar.messenger())
         let optimoveFlutterPlugin = SwiftOptimoveFlutterSdkPlugin()
         optimoveFlutterPlugin.initOptimove(registrar: registrar)
         registrar.addMethodCallDelegate(optimoveFlutterPlugin, channel: channel)
     }
-    
-    private var eventSink: FlutterEventSink?
 
+    fileprivate var eventSink: FlutterEventSink?
+    
+    fileprivate func initOptimove(registrar: FlutterPluginRegistrar) {
+        //crash the app if the keys are not found
+        let topPath = Bundle.main.path(forResource: registrar.lookupKey(forAsset: "optimove.json"), ofType: nil)!
+        let jsonData = try! String(contentsOfFile: topPath).data(using: .utf8)
+        let optimoveKeys = try! JSONDecoder().decode(OptimoveKeys.self, from: jsonData!)
+        
+        let flutterEventChannel: FlutterEventChannel = FlutterEventChannel(name: "optimove_flutter_sdk_events", binaryMessenger: registrar.messenger())
+        flutterEventChannel.setStreamHandler(self)
+        self.initOptimove(from: optimoveKeys)
+    }
+    
+    fileprivate func initOptimove(from optimoveKeys: OptimoveKeys){
+        let config = OptimoveConfigBuilder(optimoveCredentials: optimoveKeys.optimoveCredentials, optimobileCredentials: optimoveKeys.optimobileCredentials)
+        
+        if (optimoveKeys.enableDeferredDeepLinking) {
+            let dlHandler: DeepLinkHandler = { deepLinkResolution in
+                self.emitDeeplinkResolved(deepLinkResolution: deepLinkResolution)
+            }
+            if let cname = optimoveKeys.cname {
+                config.enableDeepLinking(cname: cname, dlHandler)
+            } else {
+                config.enableDeepLinking(dlHandler)
+            }
+        }
+        
+        if #available(iOS 10, *) {
+            config.setPushReceivedInForegroundHandler(pushReceivedInForegroundHandlerBlock: { notification , UNNotificationPresentationOptions -> Void in
+                self.emitPushNotificationReceivedEvent(pushNotification: notification)
+            })
+        }
+        
+        config.setPushOpenedHandler(pushOpenedHandlerBlock: { notification in
+            self.emitPushNotificationOpenedEvent(pushNotification: notification)
+        })
+        
+        if optimoveKeys.inAppConsentStrategy != .disabled {
+            config.enableInAppMessaging(inAppConsentStrategy: optimoveKeys.inAppConsentStrategy == .autoEnroll ? .autoEnroll : .explicitByUser)
+        }
+        
+        config.setInAppDeepLinkHandler { inAppButtonPress in
+            self.emitInappButtonPress(inAppButtonPress: inAppButtonPress)
+        }
+
+        Optimove.initialize(with: config.build())
+        setAdditionalListeners()
+    }
+    
+    fileprivate func setAdditionalListeners(){
+        OptimoveInApp.setOnInboxUpdated {
+            self.emitInboxUpdated()
+        }
+    }
+        
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         switch call.method {
             case "registerUser":
@@ -39,81 +92,163 @@ public class SwiftOptimoveFlutterSdkPlugin: NSObject, FlutterPlugin, FlutterStre
               result(nil)
             case "inAppMarkAllInboxItemsAsRead":
               result(OptimoveInApp.markAllInboxItemsAsRead());
-            case "getInboxSummary":
-              OptimoveInApp.getInboxSummaryAsync(inboxSummaryBlock: { inAppInboxSummary in
-                  result(inAppInboxSummary)
-              })
+            case "inAppGetInboxSummary":
+              handleInAppInboxSummary(result)
             case "inAppUpdateConsent":
-              OptimoveInApp.updateConsent(forUser: call.arguments as! Bool)
+              OptimoveInApp.updateConsent(forUser: (call.arguments as! Dictionary<String, Any>)["consentGiven"] as! Bool)
               result(nil)
+            case "inAppMarkAsRead":
+              inAppMarkAsRead(call, result)
+            case "inAppDeleteMessageFromInbox":
+              inAppDeleteMessageFromInbox(call, result)
+            case "inAppGetInboxItems":
+              inAppGetInboxItems(result)
+            case "inAppPresentInboxMessage":
+              inAppPresentInboxMessage(call, result)
             default:
               result(nil)
         }
     }
     
-    private func initOptimove(registrar: FlutterPluginRegistrar) {
-        //crash the app if the keys are not found
-        let topPath = Bundle.main.path(forResource: registrar.lookupKey(forAsset: "optimove.json"), ofType: nil)!
-        let jsonData = try! String(contentsOfFile: topPath).data(using: .utf8)
-        let optimoveKeys = try! JSONDecoder().decode(OptimoveKeys.self, from: jsonData!)
+    fileprivate func inAppPresentInboxMessage(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
+        let id = (call.arguments as! Dictionary<String, Any>)["id"] as! Int
         
-        let flutterEventChannel: FlutterEventChannel = FlutterEventChannel(name: "optimove_flutter_sdk_events", binaryMessenger: registrar.messenger())
-        flutterEventChannel.setStreamHandler(self)
-        self.initOptimove(from: optimoveKeys)
-    }
-    
-    private func initOptimove(from optimoveKeys: OptimoveKeys){
-        let config = OptimoveConfigBuilder(optimoveCredentials: optimoveKeys.optimoveCredentials, optimobileCredentials: optimoveKeys.optimobileCredentials)
-        
-        if (optimoveKeys.enableDeferredDeepLinking) {
-            let dlHandler: DeepLinkHandler = { deepLinkResolution in
-                let center = NotificationCenter.default
-                let deepLinkDict = ["DeepLink" : deepLinkResolution]
-                center.post(name: NSNotification.Name(rawValue: "DeepLinking"), object: nil, userInfo: deepLinkDict)
-            }
-            if let cname = optimoveKeys.cname {
-                config.enableDeepLinking(cname: cname, dlHandler)
-            } else {
-                config.enableDeepLinking(dlHandler)
-            }
-        }
-        
-        if #available(iOS 10, *) {
-            config.setPushReceivedInForegroundHandler(pushReceivedInForegroundHandlerBlock: { notification , UNNotificationPresentationOptions -> Void in
-                self.emitPushNotificationReceivedEvent(pushNotification: notification)
-            })
-        }
-        
-        config.setPushOpenedHandler(pushOpenedHandlerBlock: { notification in
-            self.emitPushNotificationOpenedEvent(pushNotification: notification)
-        })
-        
-        if optimoveKeys.inAppConsentStrategy != .disabled {
-            config.enableInAppMessaging(inAppConsentStrategy: optimoveKeys.inAppConsentStrategy == .autoEnroll ? .autoEnroll : .explicitByUser)
-        }
-        
-        config.setInAppDeepLinkHandler(inAppDeepLinkHandlerBlock: { inAppButtonPress in
-            print("In app deeplink handler")
-        })
+        let inboxItems: [InAppInboxItem] = OptimoveInApp.getInboxItems()
+        var presentationResult: InAppMessagePresentationResult = .FAILED
 
-        Optimove.initialize(with: config.build())
+        for item in inboxItems {
+            if item.id == id {
+                presentationResult = OptimoveInApp.presentInboxMessage(item: item)
+                break
+            }
+        }
+        
+        switch presentationResult {
+        case .PRESENTED:
+            result(0)
+        case .EXPIRED:
+            result(1)
+        case .FAILED:
+            result(2)
+        }
     }
     
-    private func emitPushNotificationReceivedEvent(pushNotification: PushNotification){
+    fileprivate func inAppMarkAsRead(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
+        let id = (call.arguments as! Dictionary<String, Any>)["id"] as! Int
+        
+        let inboxItems: [InAppInboxItem] = OptimoveInApp.getInboxItems()
+        var marked = false
+        inboxItems.forEach { item in
+            if item.id == id {
+                marked = OptimoveInApp.markAsRead(item: item)
+            }
+        }
+        
+        result(marked)
+    }
+    
+    fileprivate func inAppGetInboxItems(_ result: @escaping FlutterResult) {
+        let inboxItems: [InAppInboxItem] = OptimoveInApp.getInboxItems()
+        
+        var inboxItemsMaps: [[String: Any?]] = []
+        
+        inboxItems.forEach { item in
+            var inboxItemMap = [String: Any?]()
+            
+            inboxItemMap["id"] = item.id
+            inboxItemMap["title"] = item.title
+            inboxItemMap["subtitle"] = item.subtitle
+            inboxItemMap["sentAt"] = item.sentAt
+            inboxItemMap["availableFrom"] = item.availableFrom
+            inboxItemMap["availableTo"] = item.availableTo
+            inboxItemMap["dismissedAt"] = item.dismissedAt
+            inboxItemMap["data"] = item.dismissedAt
+            inboxItemMap["isRead"] = item.isRead
+            inboxItemMap["imageUrl"] = item.getImageUrl()
+            
+            inboxItemsMaps.append(inboxItemMap)
+        }
+        
+        result(inboxItemsMaps)
+    }
+    
+    fileprivate func inAppDeleteMessageFromInbox(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
+        let id = (call.arguments as! Dictionary<String, Any>)["id"] as! Int
+        
+        let inboxItems: [InAppInboxItem] = OptimoveInApp.getInboxItems()
+        var deleted = false
+        inboxItems.forEach { item in
+            if item.id == id {
+                deleted = OptimoveInApp.deleteMessageFromInbox(item: item)
+            }
+        }
+        
+        result(deleted)
+    }
+    
+    fileprivate func handleInAppInboxSummary(_ result: @escaping FlutterResult) {
+        OptimoveInApp.getInboxSummaryAsync(inboxSummaryBlock: { inAppInboxSummary in
+            var inAppInboxSummaryMap = [String: Any?]()
+            inAppInboxSummaryMap["totalCount"] = inAppInboxSummary?.totalCount
+            inAppInboxSummaryMap["unreadCount"] = inAppInboxSummary?.unreadCount
+            result(inAppInboxSummaryMap)
+        })
+    }
+    
+    
+    fileprivate func emitPushNotificationReceivedEvent(pushNotification: PushNotification){
         var notificationMap = [String: Any?]()
-        notificationMap["type"] = "push.received"
+        notificationMap["type"] = EventTypes.pushReceived.rawValue
         notificationMap["data"] = getPushNotificatioMap(from: pushNotification)
         self.eventSink?(notificationMap)
     }
     
-    private func emitPushNotificationOpenedEvent(pushNotification: PushNotification){
+    fileprivate func emitPushNotificationOpenedEvent(pushNotification: PushNotification){
         var notificationMap = [String: Any?]()
-        notificationMap["type"] = "push.opened"
+        notificationMap["type"] = EventTypes.pushOpened.rawValue
         notificationMap["data"] = getPushNotificatioMap(from: pushNotification)
         self.eventSink?(notificationMap)
     }
     
-    private func getPushNotificatioMap(from pushNotification: PushNotification) -> [String: Any?] {
+    fileprivate func emitDeeplinkResolved(deepLinkResolution: DeepLinkResolution){
+        var deeplinkResolvedMap = [String: Any?]()
+        deeplinkResolvedMap["type"] = EventTypes.pushDeepLinkResolved.rawValue
+        
+        var data = [String: Any?]()
+        var urlString: String
+        
+        switch deepLinkResolution {
+        case .lookupFailed(let dl):
+            urlString = dl.absoluteString
+        case .linkNotFound(let dl):
+            urlString = dl.absoluteString
+        case .linkExpired(let dl):
+            urlString = dl.absoluteString
+        case .linkLimitExceeded(let dl):
+            urlString = dl.absoluteString
+        case .linkMatched(let dl):
+            urlString = dl.url.absoluteString
+        }
+        data["url"] = urlString
+        deeplinkResolvedMap["data"] = data
+        self.eventSink?(deeplinkResolvedMap)
+    }
+    
+    fileprivate func emitInappButtonPress(inAppButtonPress: InAppButtonPress){
+        var inAppButtonPressMap = [String: Any?]()
+        inAppButtonPressMap["type"] = EventTypes.inAppDeepLinkPressed.rawValue
+        inAppButtonPressMap["data"] = getInappButtonPressMap(from: inAppButtonPress)
+        self.eventSink?(inAppButtonPressMap)
+    }
+    
+    fileprivate func emitInboxUpdated(){
+        var inAppButtonPressMap = [String: Any?]()
+        inAppButtonPressMap["type"] = EventTypes.inAppInboxUpdated.rawValue
+        self.eventSink?(inAppButtonPressMap)
+    }
+    
+    
+    fileprivate func getPushNotificatioMap(from pushNotification: PushNotification) -> [String: Any?] {
         var data = [String: Any?]()
         data["id"] = pushNotification.id
         data["title"] = (pushNotification.aps["alert"] as? Dictionary)?["title"]
@@ -125,7 +260,16 @@ public class SwiftOptimoveFlutterSdkPlugin: NSObject, FlutterPlugin, FlutterStre
         return data
     }
     
-    private func handleReportEvent(_ call: FlutterMethodCall){
+    fileprivate func getInappButtonPressMap(from inAppButtonPress: InAppButtonPress) -> [String: Any?] {
+        var data = [String: Any?]()
+        data["deepLinkData"] = inAppButtonPress.deepLinkData
+        data["messageData"] = inAppButtonPress.messageData
+        data["messageId"] = inAppButtonPress.messageId
+        
+        return data
+    }
+    
+    fileprivate func handleReportEvent(_ call: FlutterMethodCall){
         let event: String = (call.arguments as! Dictionary<String, Any>)["event"] as! String
         let parameters: Dictionary<String, Any>? = (call.arguments as! Dictionary<String, Any>)["parameters"] as? Dictionary<String, Any>
 
@@ -136,7 +280,7 @@ public class SwiftOptimoveFlutterSdkPlugin: NSObject, FlutterPlugin, FlutterStre
         }
     }
     
-    private func handleReportScreenVisit(_ call: FlutterMethodCall){
+    fileprivate func handleReportScreenVisit(_ call: FlutterMethodCall){
         let screenName: String = (call.arguments as! Dictionary<String, Any>)["screenName"] as! String
         let screenCategory: String? = (call.arguments as! Dictionary<String, Any>)["screenCategory"] as? String
 
@@ -195,4 +339,12 @@ class OptimoveKeys: Decodable {
             enableDeferredDeepLinking = false
         }
     }
+}
+
+enum EventTypes: String {
+    case pushReceived = "push.received"
+    case pushOpened = "push.opened"
+    case pushDeepLinkResolved = "deep-linking.linkResolved"
+    case inAppInboxUpdated = "inbox.updated"
+    case inAppDeepLinkPressed = "in-app.deepLinkPressed"
 }
