@@ -151,6 +151,8 @@ public class SwiftOptimoveFlutterSdkPlugin: NSObject, FlutterPlugin, FlutterStre
         let inboxItems: [InAppInboxItem] = OptimoveInApp.getInboxItems()
         
         var inboxItemsMaps: [[String: Any?]] = []
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ"
         
         inboxItems.forEach { item in
             var inboxItemMap = [String: Any?]()
@@ -158,13 +160,13 @@ public class SwiftOptimoveFlutterSdkPlugin: NSObject, FlutterPlugin, FlutterStre
             inboxItemMap["id"] = item.id
             inboxItemMap["title"] = item.title
             inboxItemMap["subtitle"] = item.subtitle
-            inboxItemMap["sentAt"] = item.sentAt
-            inboxItemMap["availableFrom"] = item.availableFrom
-            inboxItemMap["availableTo"] = item.availableTo
-            inboxItemMap["dismissedAt"] = item.dismissedAt
-            inboxItemMap["data"] = item.dismissedAt
-            inboxItemMap["isRead"] = item.isRead
-            inboxItemMap["imageUrl"] = item.getImageUrl()
+            inboxItemMap["sentAt"] = dateFormatter.string(from:  item.sentAt)
+            inboxItemMap["availableFrom"] = item.availableFrom != nil ? dateFormatter.string(from:  item.availableFrom!) : nil
+            inboxItemMap["availableTo"] = item.availableTo != nil ? dateFormatter.string(from:  item.availableTo!) : nil
+            inboxItemMap["dismissedAt"] = item.dismissedAt != nil ? dateFormatter.string(from:  item.dismissedAt!) : nil
+            inboxItemMap["isRead"] = item.isRead()
+            inboxItemMap["imageUrl"] = item.getImageUrl()?.absoluteString
+            inboxItemMap["data"] = item.data
             
             inboxItemsMaps.append(inboxItemMap)
         }

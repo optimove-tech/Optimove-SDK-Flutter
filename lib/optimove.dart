@@ -244,7 +244,7 @@ class OptimoveInAppInboxItem {
         sentAt = DateTime.parse(map['sentAt']),
         availableFrom = map['availableFrom'] != null ? DateTime.parse(map['availableFrom']) : null,
         availableTo = map['availableTo'] != null ? DateTime.parse(map['availableTo']) : null,
-        data = map['data'],
+        data =  map['data'] != null ? Map<String, dynamic>.from(map['data']) : null,
         dismissedAt = map['dismissedAt'] != null ? DateTime.parse(map['dismissedAt']) : null,
         isRead = map['isRead'],
         imageUrl = map['imageUrl'];

@@ -62,6 +62,12 @@ class _InboxState extends State<Inbox> {
           )),
       home: Scaffold(
           appBar: AppBar(
+            leading: BackButton(
+                color: Colors.white,
+                onPressed: () {
+                    Navigator.pop(context);
+                },
+            ),
             title: const Text('In-app inbox'),
             actions: [
               IconButton(
