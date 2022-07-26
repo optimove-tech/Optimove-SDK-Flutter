@@ -188,7 +188,11 @@ public class OptimoveInitProvider extends ContentProvider {
         OptimoveInApp.getInstance().setDeepLinkHandler((context, data) -> {
             Map<String, Object> event = new HashMap<>(2);
             event.put("type", "in-app.deepLinkPressed");
-            event.put("data", data);
+            try {
+                event.put("data", JsonUtils.toMap(data.getDeepLinkData()));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
             eventSink.send(event);
         });
     }

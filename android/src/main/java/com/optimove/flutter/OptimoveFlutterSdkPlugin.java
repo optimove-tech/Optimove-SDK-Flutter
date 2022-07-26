@@ -142,7 +142,7 @@ public class OptimoveFlutterSdkPlugin implements FlutterPlugin, MethodCallHandle
     List<InAppInboxItem> items = OptimoveInApp.getInstance().getInboxItems();
     for (InAppInboxItem item : items) {
       if (id == item.getId()) {
-        marked = OptimoveInApp.getInstance().mark=AsRead(item);
+        marked = OptimoveInApp.getInstance().markAsRead(item);
         break;
       }
     }
