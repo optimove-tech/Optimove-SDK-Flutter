@@ -88,6 +88,12 @@ class _MyAppState extends State<HomePage> {
 
       _showAlert('Optimove Deep Link', children);
     });
+
+    Optimove.setInAppDeeplinkHandler((data) {
+      _showAlert('Optimove In app deeplink', [
+        Text(jsonEncode(data))
+      ]);
+    });
   }
   Future<void> getIdentifiers() async {
     optimobileIdentifier = await Optimove.getCurrentUserIdentifier();

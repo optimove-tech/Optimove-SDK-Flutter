@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:optimove_sdk_flutter/optimove.dart';
@@ -143,7 +145,22 @@ class _InboxState extends State<Inbox> {
       )
           : null,
       onTap: () {
-        Optimove.presentInboxMessage(item);
+        showDialog(context: context, builder: (context) {
+          return AlertDialog(
+            title: const Text("Inbox data"),
+            content: SingleChildScrollView(
+              child:  Text(jsonEncode(item.data)),
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
       },
       onLongPress: () {
         showModalBottomSheet(
@@ -152,6 +169,15 @@ class _InboxState extends State<Inbox> {
               return SafeArea(
                   child: Wrap(
                     children: [
+                      ListTile(
+                        leading:const Icon(Icons.remove_red_eye),
+                        title: const Text(
+                          'View',
+                        ),
+                        onTap: () {
+                          Optimove.presentInboxMessage(item);
+                        },
+                      ),
                       ListTile(
                         leading:const Icon(Icons.mark_email_read),
                         title: const Text(

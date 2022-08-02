@@ -221,8 +221,8 @@ class OptimoveDeepLinkOutcome {
   OptimoveDeepLinkOutcome.fromMap(Map<String, dynamic> map)
       : resolution = OptimoveDeepLinkResolution.values[map['resolution']],
         url = map['url'],
-        content = map['link']['content'] != null ? OptimoveDeepLinkContent(map['link']['content']['title'], map['link']['content']['description']) : null,
-        linkData = map['link']['data'] != null ? Map<String, dynamic>.from(map['link']['data']) : null;
+        content = map['link']?['content'] != null ? OptimoveDeepLinkContent(map['link']['content']['title'], map['link']['content']['description']) : null,
+        linkData = map['link']?['data'] != null ? Map<String, dynamic>.from(map['link']['data']) : null;
 }
 
 class OptimoveInAppInboxItem {

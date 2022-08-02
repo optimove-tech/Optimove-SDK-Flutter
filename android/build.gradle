@@ -30,9 +30,9 @@ android {
     }
 
     defaultConfig {
-        minSdkVersion 19
+        minSdkVersion 21
     }
 }
 dependencies {
-    api 'com.optimove.android:optimove-android:5.+'
+    api 'com.optimove.android:optimove-android:6.+'
 }

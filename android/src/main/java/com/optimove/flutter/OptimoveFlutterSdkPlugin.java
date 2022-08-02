@@ -9,6 +9,8 @@ import com.optimove.android.optimobile.InAppInboxItem;
 import com.optimove.android.optimobile.Optimobile;
 import com.optimove.android.optimobile.OptimoveInApp;
 
+import org.json.JSONException;
+
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -253,7 +255,13 @@ public class OptimoveFlutterSdkPlugin implements FlutterPlugin, MethodCallHandle
       mapped.put("subtitle", item.getSubtitle());
       mapped.put("sentAt", formatter.format(item.getSentAt()));
       mapped.put("isRead", item.isRead());
-      mapped.put("data", item.getData());
+      if (item.getData() != null) {
+        try {
+          mapped.put("data",  JsonUtils.toMap(item.getData()));
+        } catch (JSONException e) {
+          e.printStackTrace();
+        }
+      }
       mapped.put("imageUrl", item.getImageUrl() != null ? item.getImageUrl().toString() : null);
 
       Date availableFrom = item.getAvailableFrom();
