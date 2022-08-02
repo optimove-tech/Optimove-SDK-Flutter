@@ -222,14 +222,28 @@ public class SwiftOptimoveFlutterSdkPlugin: NSObject, FlutterPlugin, FlutterStre
         switch deepLinkResolution {
         case .lookupFailed(let dl):
             urlString = dl.absoluteString
+            data["resolution"] = 0
         case .linkNotFound(let dl):
             urlString = dl.absoluteString
+            data["resolution"] = 1
         case .linkExpired(let dl):
             urlString = dl.absoluteString
+            data["resolution"] = 2
         case .linkLimitExceeded(let dl):
             urlString = dl.absoluteString
+            data["resolution"] = 3
         case .linkMatched(let dl):
             urlString = dl.url.absoluteString
+            data["resolution"] = 4
+            var content = [String: Any?]()
+            content["title"] = dl.content.title
+            content["description"] = dl.content.description
+            
+            var link = [String: Any?]()
+            link["content"] = content
+            link["data"] = dl.data
+            
+            data["link"] = link
         }
         data["url"] = urlString
         deeplinkResolvedMap["data"] = data
