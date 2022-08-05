@@ -290,7 +290,7 @@ class _MyAppState extends State<HomePage> {
                 onPressed: () {
                   Optimove.pushRequestDeviceToken();
                 },
-                child: const Text("Request device token")),
+                child: const Text("Register push")),
           ],
         ),
       ),

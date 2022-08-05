@@ -83,7 +83,7 @@ public class SwiftOptimoveFlutterSdkPlugin: NSObject, FlutterPlugin, FlutterStre
             case "reportScreenVisit":
               handleReportScreenVisit(call)
               result(nil)
-            case "getCurrentUserIdentifier":
+            case "getUserId":
               result(nil)
             case "getVisitorId":
               result(Optimove.getVisitorID())

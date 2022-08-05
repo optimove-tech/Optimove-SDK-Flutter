@@ -38,14 +38,16 @@ class Optimove {
     return _methodChannel.invokeMethod('reportScreenVisit', {'screenName': screenName, 'screenCategory': screenCategory});
   }
 
-  static Future<String?> getCurrentUserIdentifier() async {
-    String? userIdentifier = await _methodChannel.invokeMethod('getCurrentUserIdentifier');
-    return userIdentifier;
+  static Future<String?> getUserId() async {
+    String? userId = await _methodChannel.invokeMethod('getUserId');
+    return userId;
   }
 
   static void pushRequestDeviceToken() {
     if (Platform.isIOS) {
       _methodChannel.invokeMethod('pushRequestDeviceToken');
+    } else if (Platform.isAndroid) {
+      _methodChannel.invokeMethod('pushRegister');
     }
   }
 

@@ -100,8 +100,8 @@ public class OptimoveFlutterSdkPlugin implements FlutterPlugin, MethodCallHandle
       case "reportScreenVisit":
         handleReportScreenVisit(call, result);
         break;
-      case "getCurrentUserIdentifier":
-        handleGetCurrentUserIdentifier(result);
+      case "getUserId":
+        handleGetUserId(result);
         break;
       case "enableStagingRemoteLogs":
         Optimove.enableStagingRemoteLogs();
@@ -133,6 +133,9 @@ public class OptimoveFlutterSdkPlugin implements FlutterPlugin, MethodCallHandle
         break;
       case "inAppDeleteMessageFromInbox":
         deleteInboxItem(call, result);
+        break;
+      case "pushRegister":
+        Optimove.getInstance().pushRegister();
         break;
       default: result.notImplemented();
     }
@@ -190,7 +193,7 @@ public class OptimoveFlutterSdkPlugin implements FlutterPlugin, MethodCallHandle
     }
   }
 
-  private void handleGetCurrentUserIdentifier(Result result) {
+  private void handleGetUserId(Result result) {
     String userIdentifier = Optimove.getInstance().getCurrentUserIdentifier();
     result.success(userIdentifier);
   }
