@@ -96,7 +96,7 @@ class _MyAppState extends State<HomePage> {
     });
   }
   Future<void> getIdentifiers() async {
-    optimobileIdentifier = await Optimove.getCurrentUserIdentifier();
+    optimobileIdentifier = await Optimove.getUserId();
     optimoveVisitorId = await Optimove.getVisitorId();
     setState(() {});
   }

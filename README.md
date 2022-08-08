@@ -16,10 +16,9 @@ In this guide we will discuss the steps to implement the Optimove Flutter SDK fo
 ### Mobile Messaging
 
 1. [Push Setup](https://github.com/optimove-tech/Optimove-SDK-Flutter/wiki/push-setup)
-2. [Push Advanced Features](https://github.com/optimove-tech/Optimove-SDK-Flutter/wiki/push-advanced)
-3. [In-App Setup](https://github.com/optimove-tech/Optimove-SDK-Flutter/wiki/in-app)
-4. [Deferred Deep Linking](https://github.com/optimove-tech/Optimove-SDK-Flutter/wiki/deferred-deep-linking)
-5. [Testing](https://github.com/optimove-tech/Optimove-SDK-Flutter/wiki/testing-troubleshooting)
+2. [In-App Setup](https://github.com/optimove-tech/Optimove-SDK-Flutter/wiki/in-app)
+3. [Deferred Deep Linking](https://github.com/optimove-tech/Optimove-SDK-Flutter/wiki/deferred-deep-linking)
+4. [Testing](https://github.com/optimove-tech/Optimove-SDK-Flutter/wiki/testing-troubleshooting)
 
 ## License
 
