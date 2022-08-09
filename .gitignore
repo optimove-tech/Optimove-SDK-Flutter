@@ -18,6 +18,7 @@ migrate_working_dir/
 
 /example/android/app/google-services.json
 /example/optimove.json
+/local.properties
 
 # The .vscode folder contains launch configuration and tasks you configure in
 # VS Code which you may wish to be included in version control, so this line
