@@ -42,5 +42,5 @@ end
 
 target 'NotificationServiceExtension' do
   use_frameworks!
-  pod 'KumulosSdkObjectiveCExtension', '4.6.0'
+  pod 'OptimoveNotificationServiceExtension', '~> 5.0'
 end
