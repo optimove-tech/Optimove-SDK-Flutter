@@ -32,12 +32,13 @@ import static com.optimove.flutter.OptimoveFlutterSdkPlugin.eventSink;
 
 public class OptimoveInitProvider extends ContentProvider {
     private static final String TAG = OptimoveInitProvider.class.getName();
-    private static final String OPTIMOVE_CREDENTIALS = "optimoveCredentials";
-    private static final String OPTIMOBILE_CREDENTIALS = "optimobileCredentials";
-    private static final String KEY_IN_APP_CONSENT_STRATEGY = "inAppConsentStrategy";
-    private static final String IN_APP_AUTO_ENROLL = "auto-enroll";
-    private static final String IN_APP_EXPLICIT_BY_USER = "explicit-by-user";
-    private static final String KEY_ENABLE_DDL = "enableDeferredDeepLinking";
+
+    private static final String OPTIMOVE_CREDENTIALS_KEY = "optimoveCredentials";
+    private static final String OPTIMOBILE_CREDENTIALS_KEY = "optimobileCredentials";
+    private static final String IN_APP_CONSENT_STRATEGY_KEY = "inAppConsentStrategy";
+    private static final String IN_APP_AUTO_ENROLL_KEY = "auto-enroll";
+    private static final String IN_APP_EXPLICIT_BY_USER_KEY = "explicit-by-user";
+    private static final String ENABLE_DDL_KEY = "enableDeferredDeepLinking";
 
     @Override
     public boolean onCreate() {
@@ -123,16 +124,16 @@ public class OptimoveInitProvider extends ContentProvider {
             while (reader.hasNext()) {
                 String key = reader.nextName();
                 switch (key) {
-                    case OPTIMOVE_CREDENTIALS:
+                    case OPTIMOVE_CREDENTIALS_KEY:
                         optimoveCredentials = reader.nextString();
                         break;
-                    case OPTIMOBILE_CREDENTIALS:
+                    case OPTIMOBILE_CREDENTIALS_KEY:
                         optimobileCredentilas = reader.nextString();
                         break;
-                    case KEY_IN_APP_CONSENT_STRATEGY:
+                    case IN_APP_CONSENT_STRATEGY_KEY:
                         inAppConsentStrategy = reader.nextString();
                         break;
-                    case KEY_ENABLE_DDL:
+                    case ENABLE_DDL_KEY:
                         JsonToken tok = reader.peek();
                         if (JsonToken.BOOLEAN == tok) {
                             enableDeepLinking = reader.nextBoolean();
@@ -167,10 +168,10 @@ public class OptimoveInitProvider extends ContentProvider {
 
     private void configureInAppMessaging(@NonNull OptimoveConfig.Builder config, @NonNull String inAppConsentStrategy) {
         switch (inAppConsentStrategy) {
-            case IN_APP_AUTO_ENROLL:
+            case IN_APP_AUTO_ENROLL_KEY:
                 config.enableInAppMessaging(OptimoveConfig.InAppConsentStrategy.AUTO_ENROLL);
                 break;
-            case IN_APP_EXPLICIT_BY_USER:
+            case IN_APP_EXPLICIT_BY_USER_KEY:
                 config.enableInAppMessaging(OptimoveConfig.InAppConsentStrategy.EXPLICIT_BY_USER);
                 break;
         }
