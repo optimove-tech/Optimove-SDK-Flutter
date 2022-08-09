@@ -32,10 +32,6 @@ import io.flutter.plugin.common.MethodChannel.Result;
 
 /** OptimoveFlutterSdkPlugin */
 public class OptimoveFlutterSdkPlugin implements FlutterPlugin, MethodCallHandler, ActivityAware {
-  /// The MethodChannel that will the communication between Flutter and native Android
-  ///
-  /// This local reference serves to register the plugin with the Flutter Engine and unregister it
-  /// when the Flutter Engine is detached from the Activity
   private MethodChannel channel;
   private EventChannel eventChannel;
 
@@ -81,7 +77,7 @@ public class OptimoveFlutterSdkPlugin implements FlutterPlugin, MethodCallHandle
 
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
-    switch (call.method){//preparing for alot of different options
+    switch (call.method) {
       case "registerUser":
         handleRegisterUser(call, result);
         break;
@@ -179,7 +175,8 @@ public class OptimoveFlutterSdkPlugin implements FlutterPlugin, MethodCallHandle
         break;
       }
     }
-    // Map the enum ordinals into the order expected in the dart side (matches ObjC)
+
+    // Map the enum into the order expected in the dart side where its mapped back
     switch (presentationResult) {
       case PRESENTED:
         result.success(0);
