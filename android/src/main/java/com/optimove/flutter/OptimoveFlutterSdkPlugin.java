@@ -6,7 +6,6 @@ import androidx.annotation.NonNull;
 
 import com.optimove.android.Optimove;
 import com.optimove.android.optimobile.InAppInboxItem;
-import com.optimove.android.optimobile.Optimobile;
 import com.optimove.android.optimobile.OptimoveInApp;
 
 import org.json.JSONException;

@@ -2,7 +2,7 @@ import Flutter
 import UIKit
 import OptimoveSDK
 
-public class SwiftOptimoveFlutterSdkPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
+public class SwiftOptimoveFlutterSdkPlugin: NSObject, FlutterPlugin {
     
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "optimove_flutter_sdk", binaryMessenger: registrar.messenger())
@@ -11,7 +11,7 @@ public class SwiftOptimoveFlutterSdkPlugin: NSObject, FlutterPlugin, FlutterStre
         registrar.addMethodCallDelegate(optimoveFlutterPlugin, channel: channel)
     }
 
-    fileprivate var eventSink: FlutterEventSink?
+    fileprivate var eventSink = QueueStreamHandler()
     
     fileprivate func initOptimove(registrar: FlutterPluginRegistrar) {
         //crash the app if the keys are not found
@@ -20,7 +20,7 @@ public class SwiftOptimoveFlutterSdkPlugin: NSObject, FlutterPlugin, FlutterStre
         let optimoveKeys = try! JSONDecoder().decode(OptimoveKeys.self, from: jsonData!)
         
         let flutterEventChannel: FlutterEventChannel = FlutterEventChannel(name: "optimove_flutter_sdk_events", binaryMessenger: registrar.messenger())
-        flutterEventChannel.setStreamHandler(self)
+        flutterEventChannel.setStreamHandler(eventSink)
         self.initOptimove(from: optimoveKeys)
     }
     
@@ -202,14 +202,14 @@ public class SwiftOptimoveFlutterSdkPlugin: NSObject, FlutterPlugin, FlutterStre
         var notificationMap = [String: Any?]()
         notificationMap["type"] = EventTypes.pushReceived.rawValue
         notificationMap["data"] = getPushNotificatioMap(from: pushNotification)
-        self.eventSink?(notificationMap)
+        self.eventSink.send(notificationMap)
     }
     
     fileprivate func emitPushNotificationOpenedEvent(pushNotification: PushNotification){
         var notificationMap = [String: Any?]()
         notificationMap["type"] = EventTypes.pushOpened.rawValue
         notificationMap["data"] = getPushNotificatioMap(from: pushNotification)
-        self.eventSink?(notificationMap)
+        self.eventSink.send(notificationMap)
     }
     
     fileprivate func emitDeeplinkResolved(deepLinkResolution: DeepLinkResolution){
@@ -247,20 +247,20 @@ public class SwiftOptimoveFlutterSdkPlugin: NSObject, FlutterPlugin, FlutterStre
         }
         data["url"] = urlString
         deeplinkResolvedMap["data"] = data
-        self.eventSink?(deeplinkResolvedMap)
+        self.eventSink.send(deeplinkResolvedMap)
     }
     
     fileprivate func emitInappButtonPress(inAppButtonPress: InAppButtonPress){
         var inAppButtonPressMap = [String: Any?]()
         inAppButtonPressMap["type"] = EventTypes.inAppDeepLinkPressed.rawValue
         inAppButtonPressMap["data"] = getInappButtonPressMap(from: inAppButtonPress)
-        self.eventSink?(inAppButtonPressMap)
+        self.eventSink.send(inAppButtonPressMap)
     }
     
     fileprivate func emitInboxUpdated(){
         var inAppButtonPressMap = [String: Any?]()
         inAppButtonPressMap["type"] = EventTypes.inAppInboxUpdated.rawValue
-        self.eventSink?(inAppButtonPressMap)
+        self.eventSink.send(inAppButtonPressMap)
     }
     
     
@@ -303,15 +303,6 @@ public class SwiftOptimoveFlutterSdkPlugin: NSObject, FlutterPlugin, FlutterStre
         Optimove.reportScreenVisit(screenTitle: screenName, screenCategory: screenCategory)
     }
     
-    public func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-        self.eventSink =  events
-        return nil
-    }
-    
-    public func onCancel(withArguments arguments: Any?) -> FlutterError? {
-        self.eventSink = nil
-        return nil
-    }
 }
         
 enum InAppConsentStrategy: String {
@@ -354,6 +345,35 @@ class OptimoveKeys: Decodable {
         } else {
             enableDeferredDeepLinking = false
         }
+    }
+}
+
+class QueueStreamHandler: NSObject, FlutterStreamHandler {
+    
+    private var eventSink: FlutterEventSink?
+    private var eventQueue: [Any] = []
+    
+    func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+        self.eventSink = events
+        while !eventQueue.isEmpty {
+            self.eventSink?(eventQueue.removeFirst())
+        }
+        return nil
+    }
+    
+    func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        self.eventSink = nil
+        self.eventQueue.removeAll()
+        return nil
+    }
+    
+    func send(_ event: Any) {
+        if let eventSink = eventSink {
+            eventSink(event)
+            return
+        }
+        
+        eventQueue.append(event)
     }
 }
 
