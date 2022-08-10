@@ -65,7 +65,7 @@ public class OptimoveFlutterSdkPlugin implements FlutterPlugin, MethodCallHandle
 
   @Override
   public void onReattachedToActivityForConfigChanges(@NonNull ActivityPluginBinding binding) {
-    currentActivityRef = new WeakReference<>(null);
+    currentActivityRef = new WeakReference<>(binding.getActivity());
   }
 
   @Override
