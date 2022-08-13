@@ -68,6 +68,8 @@ class _MyAppState extends State<HomePage> {
       _showAlert('Received Push', <Widget>[
         Text(push.title ?? 'No title'),
         Text(push.message ?? 'No message'),
+        const Text('Data:'),
+        Text(jsonEncode(push.data))
       ]);
     });
 

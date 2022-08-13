@@ -9,6 +9,7 @@ public class SwiftOptimoveFlutterSdkPlugin: NSObject, FlutterPlugin {
         let optimoveFlutterPlugin = SwiftOptimoveFlutterSdkPlugin()
         optimoveFlutterPlugin.initOptimove(registrar: registrar)
         registrar.addMethodCallDelegate(optimoveFlutterPlugin, channel: channel)
+        registrar.addApplicationDelegate(optimoveFlutterPlugin)
     }
 
     fileprivate var eventSink = QueueStreamHandler()
@@ -301,6 +302,12 @@ public class SwiftOptimoveFlutterSdkPlugin: NSObject, FlutterPlugin {
         let screenCategory: String? = (call.arguments as! Dictionary<String, Any>)["screenCategory"] as? String
 
         Optimove.reportScreenVisit(screenTitle: screenName, screenCategory: screenCategory)
+    }
+    
+    public func application(_ application: UIApplication,
+                                  didReceiveRemoteNotification userInfo: [AnyHashable : Any],
+                                  fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) -> Bool {
+        return false
     }
     
 }
