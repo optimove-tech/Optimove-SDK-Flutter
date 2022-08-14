@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.optimove.flutter.OptimoveFlutterSdkPlugin.eventSink;
+import static com.optimove.flutter.OptimoveFlutterSdkPlugin.eventSinkDelayed;
 
 public class OptimoveInitProvider extends ContentProvider {
     private static final String TAG = OptimoveInitProvider.class.getName();
@@ -237,7 +238,7 @@ public class OptimoveInitProvider extends ContentProvider {
             event.put("type", "deep-linking.linkResolved");
             event.put("data", eventData);
 
-            eventSink.send(event);
+            eventSinkDelayed.send(event);
         };
     }
 

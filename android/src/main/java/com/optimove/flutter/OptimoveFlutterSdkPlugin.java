@@ -31,26 +31,35 @@ import io.flutter.plugin.common.MethodChannel.Result;
 
 /** OptimoveFlutterSdkPlugin */
 public class OptimoveFlutterSdkPlugin implements FlutterPlugin, MethodCallHandler, ActivityAware {
-  private MethodChannel channel;
+  private MethodChannel methodChannel;
   private EventChannel eventChannel;
+  private EventChannel eventChannelDelayed;
 
   static WeakReference<Activity> currentActivityRef = new WeakReference<>(null);
   static QueueingEventStreamHandler eventSink = new QueueingEventStreamHandler();
+  static QueueingEventStreamHandler eventSinkDelayed = new QueueingEventStreamHandler();
 
   @Override
   public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
-    channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "optimove_flutter_sdk");
-    channel.setMethodCallHandler(this);
+    methodChannel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "optimove_flutter_sdk");
+    methodChannel.setMethodCallHandler(this);
 
     eventChannel = new EventChannel(flutterPluginBinding.getBinaryMessenger(), "optimove_flutter_sdk_events");
     eventChannel.setStreamHandler(eventSink);
+
+    eventChannelDelayed = new EventChannel(flutterPluginBinding.getBinaryMessenger(), "optimove_flutter_sdk_events_delayed");
+    eventChannelDelayed.setStreamHandler(eventSinkDelayed);
   }
 
   @Override
   public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
-    channel.setMethodCallHandler(null);
+    methodChannel.setMethodCallHandler(null);
+
     eventChannel.setStreamHandler(null);
     eventSink.onCancel(null);
+
+    eventChannelDelayed.setStreamHandler(null);
+    eventSinkDelayed.onCancel(null);
   }
 
   @Override

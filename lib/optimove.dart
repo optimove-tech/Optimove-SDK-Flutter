@@ -4,8 +4,11 @@ import 'dart:io' show Platform;
 
 class Optimove {
   static const MethodChannel _methodChannel = MethodChannel('optimove_flutter_sdk');
-  static const EventChannel _eventChannel = EventChannel('optimove_flutter_sdk_events');
-  static StreamSubscription? _eventStream;
+  static const EventChannel _eventChannelImmediate = EventChannel('optimove_flutter_sdk_events');
+  static StreamSubscription? _eventStreamImmediate;
+
+  static const EventChannel _eventChannelDelayed = EventChannel('optimove_flutter_sdk_events_delayed');
+  static StreamSubscription? _eventStreamDelayed;
 
   static void Function(OptimovePushNotification)? _pushOpenedHandler;
   static void Function(OptimovePushNotification)? _pushReceivedHandler;
@@ -112,49 +115,86 @@ class Optimove {
 
   static void setPushReceivedHandler(void Function(OptimovePushNotification)? pushReceivedHandler) {
     _pushReceivedHandler = pushReceivedHandler;
-    initStreamIfNeeded();
+    initImmediateStreamIfNeeded();
   }
 
   static void setPushOpenedHandler(void Function(OptimovePushNotification)? pushOpenedHandler) {
     _pushOpenedHandler = pushOpenedHandler;
-    initStreamIfNeeded();
+    initDelayedStreamIfNeeded();
   }
 
   static void setDeeplinkHandler(void Function(OptimoveDeepLinkOutcome)? deepLinkHandler) {
     _deepLinkHandler = deepLinkHandler;
-    initStreamIfNeeded();
+    initDelayedStreamIfNeeded();
   }
 
   static void setInAppDeeplinkHandler(void Function(Map<String, dynamic>)? inAppDeepLinkHandler) {
     _inAppDeepLinkHandler = inAppDeepLinkHandler;
-    initStreamIfNeeded();
+    initImmediateStreamIfNeeded();
   }
 
   static void setOnInboxUpdatedHandler(Function? handler) {
     _inboxUpdatedHandler = handler;
-    initStreamIfNeeded();
+    initImmediateStreamIfNeeded();
   }
 
-  static void initStreamIfNeeded() {
-    if (!listenersExist()) {
-      _eventStream?.cancel();
-      _eventStream = null;
+  static void initImmediateStreamIfNeeded() {
+    if (!immediateListenersExist()) {
+      _eventStreamImmediate?.cancel();
+      _eventStreamImmediate = null;
       return;
     }
 
-    if (_eventStream != null) {
+    if (_eventStreamImmediate != null) {
       return;
     }
 
-    initStream();
+    initImmediateStream();
   }
 
-  static bool listenersExist() {
-    return _pushOpenedHandler != null || _pushReceivedHandler != null || _deepLinkHandler != null || _inboxUpdatedHandler != null || _inAppDeepLinkHandler != null;
+  static void initDelayedStreamIfNeeded() {
+    if (!delayedListenersExist()) {
+      _eventStreamDelayed?.cancel();
+      _eventStreamDelayed = null;
+      return;
+    }
+
+    if (_eventStreamDelayed != null) {
+      return;
+    }
+
+    initDelayedStream();
   }
 
-  static void initStream() {
-    _eventStream = _eventChannel.receiveBroadcastStream().listen((event) {
+  static bool immediateListenersExist() {
+    return _pushReceivedHandler != null || _inboxUpdatedHandler != null || _inAppDeepLinkHandler != null;
+  }
+
+  static bool delayedListenersExist() {
+    return _pushOpenedHandler != null || _deepLinkHandler != null;
+  }
+
+  static void initImmediateStream() {
+    _eventStreamImmediate = _eventChannelImmediate.receiveBroadcastStream().listen((event) {
+      String type = event['type'];
+      Map<String, dynamic> data = Map<String, dynamic>.from(event['data']);
+
+      switch (type) {
+        case 'push.received':
+          _pushReceivedHandler?.call(OptimovePushNotification.fromMap(data));
+          return;
+        case 'inbox.updated':
+          _inboxUpdatedHandler?.call();
+          return;
+        case 'in-app.deepLinkPressed':
+          _inAppDeepLinkHandler?.call(data);
+          return;
+      }
+    });
+  }
+
+  static void initDelayedStream() {
+    _eventStreamDelayed = _eventChannelDelayed.receiveBroadcastStream().listen((event) {
       String type = event['type'];
       Map<String, dynamic> data = Map<String, dynamic>.from(event['data']);
 
@@ -162,17 +202,8 @@ class Optimove {
         case 'push.opened':
           _pushOpenedHandler?.call(OptimovePushNotification.fromMap(data));
           return;
-        case 'push.received':
-          _pushReceivedHandler?.call(OptimovePushNotification.fromMap(data));
-          return;
         case 'deep-linking.linkResolved':
           _deepLinkHandler?.call(OptimoveDeepLinkOutcome.fromMap(data));
-          return;
-        case 'inbox.updated':
-          _inboxUpdatedHandler?.call();
-          return;
-        case 'in-app.deepLinkPressed':
-          _inAppDeepLinkHandler?.call(data);
           return;
       }
     });

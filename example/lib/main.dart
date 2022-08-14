@@ -315,7 +315,7 @@ class _MyAppState extends State<HomePage> {
             ElevatedButton(
                 style: _getButtonStyle(),
                 onPressed: () {
-                  Optimove.reportEvent(event: eventNameTextController.text);
+                  Optimove.reportEvent(event: eventNameTextController.text, parameters: {"string_param":"some_param"});
                 },
                 child: const Text("Report event")),
           ],

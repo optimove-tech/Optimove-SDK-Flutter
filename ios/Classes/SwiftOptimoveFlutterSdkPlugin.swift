@@ -12,7 +12,8 @@ public class SwiftOptimoveFlutterSdkPlugin: NSObject, FlutterPlugin {
         registrar.addApplicationDelegate(optimoveFlutterPlugin)
     }
 
-    fileprivate var eventSink = QueueStreamHandler()
+    private var eventSinkImmediate = QueueStreamHandler()
+    private var eventSinkDelayed = QueueStreamHandler()
     
     fileprivate func initOptimove(registrar: FlutterPluginRegistrar) {
         //crash the app if the keys are not found
@@ -21,11 +22,14 @@ public class SwiftOptimoveFlutterSdkPlugin: NSObject, FlutterPlugin {
         let optimoveKeys = try! JSONDecoder().decode(OptimoveKeys.self, from: jsonData!)
         
         let flutterEventChannel: FlutterEventChannel = FlutterEventChannel(name: "optimove_flutter_sdk_events", binaryMessenger: registrar.messenger())
-        flutterEventChannel.setStreamHandler(eventSink)
+        flutterEventChannel.setStreamHandler(eventSinkImmediate)
+        
+        let flutterEventChannelDelayed: FlutterEventChannel = FlutterEventChannel(name: "optimove_flutter_sdk_events_delayed", binaryMessenger: registrar.messenger())
+        flutterEventChannelDelayed.setStreamHandler(eventSinkDelayed)
         self.initOptimove(from: optimoveKeys)
     }
     
-    fileprivate func initOptimove(from optimoveKeys: OptimoveKeys){
+    private func initOptimove(from optimoveKeys: OptimoveKeys){
         let config = OptimoveConfigBuilder(optimoveCredentials: optimoveKeys.optimoveCredentials, optimobileCredentials: optimoveKeys.optimobileCredentials)
         
         if (optimoveKeys.enableDeferredDeepLinking) {
@@ -61,7 +65,7 @@ public class SwiftOptimoveFlutterSdkPlugin: NSObject, FlutterPlugin {
         setAdditionalListeners()
     }
     
-    fileprivate func setAdditionalListeners(){
+    private func setAdditionalListeners(){
         OptimoveInApp.setOnInboxUpdated {
             self.emitInboxUpdated()
         }
@@ -111,7 +115,7 @@ public class SwiftOptimoveFlutterSdkPlugin: NSObject, FlutterPlugin {
         }
     }
     
-    fileprivate func inAppPresentInboxMessage(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
+    private func inAppPresentInboxMessage(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
         let id = (call.arguments as! Dictionary<String, Any>)["id"] as! Int
         
         let inboxItems: [InAppInboxItem] = OptimoveInApp.getInboxItems()
@@ -134,7 +138,7 @@ public class SwiftOptimoveFlutterSdkPlugin: NSObject, FlutterPlugin {
         }
     }
     
-    fileprivate func inAppMarkAsRead(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
+    private func inAppMarkAsRead(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
         let id = (call.arguments as! Dictionary<String, Any>)["id"] as! Int
         
         let inboxItems: [InAppInboxItem] = OptimoveInApp.getInboxItems()
@@ -148,7 +152,7 @@ public class SwiftOptimoveFlutterSdkPlugin: NSObject, FlutterPlugin {
         result(marked)
     }
     
-    fileprivate func inAppGetInboxItems(_ result: @escaping FlutterResult) {
+    private func inAppGetInboxItems(_ result: @escaping FlutterResult) {
         let inboxItems: [InAppInboxItem] = OptimoveInApp.getInboxItems()
         
         var inboxItemsMaps: [[String: Any?]] = []
@@ -175,7 +179,7 @@ public class SwiftOptimoveFlutterSdkPlugin: NSObject, FlutterPlugin {
         result(inboxItemsMaps)
     }
     
-    fileprivate func inAppDeleteMessageFromInbox(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
+    private func inAppDeleteMessageFromInbox(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
         let id = (call.arguments as! Dictionary<String, Any>)["id"] as! Int
         
         let inboxItems: [InAppInboxItem] = OptimoveInApp.getInboxItems()
@@ -189,7 +193,7 @@ public class SwiftOptimoveFlutterSdkPlugin: NSObject, FlutterPlugin {
         result(deleted)
     }
     
-    fileprivate func handleInAppInboxSummary(_ result: @escaping FlutterResult) {
+    private func handleInAppInboxSummary(_ result: @escaping FlutterResult) {
         OptimoveInApp.getInboxSummaryAsync(inboxSummaryBlock: { inAppInboxSummary in
             var inAppInboxSummaryMap = [String: Any?]()
             inAppInboxSummaryMap["totalCount"] = inAppInboxSummary?.totalCount
@@ -199,21 +203,21 @@ public class SwiftOptimoveFlutterSdkPlugin: NSObject, FlutterPlugin {
     }
     
     
-    fileprivate func emitPushNotificationReceivedEvent(pushNotification: PushNotification){
+    private func emitPushNotificationReceivedEvent(pushNotification: PushNotification){
         var notificationMap = [String: Any?]()
         notificationMap["type"] = EventTypes.pushReceived.rawValue
         notificationMap["data"] = getPushNotificatioMap(from: pushNotification)
-        self.eventSink.send(notificationMap)
+        self.eventSinkImmediate.send(notificationMap)
     }
     
-    fileprivate func emitPushNotificationOpenedEvent(pushNotification: PushNotification){
+    private func emitPushNotificationOpenedEvent(pushNotification: PushNotification){
         var notificationMap = [String: Any?]()
         notificationMap["type"] = EventTypes.pushOpened.rawValue
         notificationMap["data"] = getPushNotificatioMap(from: pushNotification)
-        self.eventSink.send(notificationMap)
+        self.eventSinkDelayed.send(notificationMap)
     }
     
-    fileprivate func emitDeeplinkResolved(deepLinkResolution: DeepLinkResolution){
+    private func emitDeeplinkResolved(deepLinkResolution: DeepLinkResolution){
         var deeplinkResolvedMap = [String: Any?]()
         deeplinkResolvedMap["type"] = EventTypes.pushDeepLinkResolved.rawValue
         
@@ -248,24 +252,24 @@ public class SwiftOptimoveFlutterSdkPlugin: NSObject, FlutterPlugin {
         }
         data["url"] = urlString
         deeplinkResolvedMap["data"] = data
-        self.eventSink.send(deeplinkResolvedMap)
+        self.eventSinkDelayed.send(deeplinkResolvedMap)
     }
     
-    fileprivate func emitInappButtonPress(inAppButtonPress: InAppButtonPress){
+    private func emitInappButtonPress(inAppButtonPress: InAppButtonPress){
         var inAppButtonPressMap = [String: Any?]()
         inAppButtonPressMap["type"] = EventTypes.inAppDeepLinkPressed.rawValue
         inAppButtonPressMap["data"] = getInappButtonPressMap(from: inAppButtonPress)
-        self.eventSink.send(inAppButtonPressMap)
+        self.eventSinkImmediate.send(inAppButtonPressMap)
     }
     
-    fileprivate func emitInboxUpdated(){
+    private func emitInboxUpdated(){
         var inAppButtonPressMap = [String: Any?]()
         inAppButtonPressMap["type"] = EventTypes.inAppInboxUpdated.rawValue
-        self.eventSink.send(inAppButtonPressMap)
+        self.eventSinkImmediate.send(inAppButtonPressMap)
     }
     
     
-    fileprivate func getPushNotificatioMap(from pushNotification: PushNotification) -> [String: Any?] {
+    private func getPushNotificatioMap(from pushNotification: PushNotification) -> [String: Any?] {
         var data = [String: Any?]()
         data["id"] = pushNotification.id
         data["title"] = (pushNotification.aps["alert"] as? Dictionary)?["title"]
@@ -277,7 +281,7 @@ public class SwiftOptimoveFlutterSdkPlugin: NSObject, FlutterPlugin {
         return data
     }
     
-    fileprivate func getInappButtonPressMap(from inAppButtonPress: InAppButtonPress) -> [String: Any?] {
+    private func getInappButtonPressMap(from inAppButtonPress: InAppButtonPress) -> [String: Any?] {
         var data = [String: Any?]()
         data["deepLinkData"] = inAppButtonPress.deepLinkData
         data["messageData"] = inAppButtonPress.messageData
@@ -286,7 +290,7 @@ public class SwiftOptimoveFlutterSdkPlugin: NSObject, FlutterPlugin {
         return data
     }
     
-    fileprivate func handleReportEvent(_ call: FlutterMethodCall){
+    private func handleReportEvent(_ call: FlutterMethodCall){
         let event: String = (call.arguments as! Dictionary<String, Any>)["event"] as! String
         let parameters: Dictionary<String, Any>? = (call.arguments as! Dictionary<String, Any>)["parameters"] as? Dictionary<String, Any>
 
@@ -297,7 +301,7 @@ public class SwiftOptimoveFlutterSdkPlugin: NSObject, FlutterPlugin {
         }
     }
     
-    fileprivate func handleReportScreenVisit(_ call: FlutterMethodCall){
+    private func handleReportScreenVisit(_ call: FlutterMethodCall){
         let screenName: String = (call.arguments as! Dictionary<String, Any>)["screenName"] as! String
         let screenCategory: String? = (call.arguments as! Dictionary<String, Any>)["screenCategory"] as? String
 

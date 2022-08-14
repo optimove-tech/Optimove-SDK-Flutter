@@ -109,6 +109,6 @@ public class PushReceiver extends PushBroadcastReceiver {
         Map<String, Object> event = new HashMap<>(2);
         event.put("type", "push.opened");
         event.put("data", pushMessageToMap(pushMessage, actionId));
-        OptimoveFlutterSdkPlugin.eventSink.send(event);
+        OptimoveFlutterSdkPlugin.eventSinkDelayed.send(event);
     }
 }
