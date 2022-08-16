@@ -1,17 +1,17 @@
 #
 # To learn more about a Podspec see http://guides.cocoapods.org/syntax/podspec.html.
-# Run `pod lib lint optimove_flutter_sdk.podspec` to validate before publishing.
+# Run `pod lib lint optimove_flutter.podspec` to validate before publishing.
 #
 Pod::Spec.new do |s|
-  s.name             = 'optimove_sdk_flutter'
-  s.version          = '0.0.1'
-  s.summary          = 'A new Flutter plugin project.'
+  s.name             = 'optimove_flutter'
+  s.version          = '1.0.0'
+  s.summary          = 'Optimove SDK Flutter plugin project.'
   s.description      = <<-DESC
-A new Flutter plugin project.
+The Optimove SDK framework is used for reporting events and receive push notifications.
                        DESC
-  s.homepage         = 'http://example.com'
+  s.homepage         = 'https://www.optimove.com/'
   s.license          = { :file => '../LICENSE' }
-  s.author           = { 'Your Company' => 'email@example.com' }
+  s.author           = { 'Optimove' => 'mobile@optimove.com' }
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
@@ -20,6 +20,6 @@ A new Flutter plugin project.
   # Flutter.framework does not contain a i386 slice.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
   s.swift_version = '5.0'
-  s.dependency 'OptimoveCore', '5.0.0'
-  s.dependency 'OptimoveSDK', '5.0.0'
+  s.dependency 'OptimoveCore', '5.1.0'
+  s.dependency 'OptimoveSDK', '5.1.0'
 end

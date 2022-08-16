@@ -29,8 +29,8 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 
-/** OptimoveFlutterSdkPlugin */
-public class OptimoveFlutterSdkPlugin implements FlutterPlugin, MethodCallHandler, ActivityAware {
+/** OptimoveFlutterPlugin */
+public class OptimoveFlutterPlugin implements FlutterPlugin, MethodCallHandler, ActivityAware {
   private MethodChannel methodChannel;
   private EventChannel eventChannel;
   private EventChannel eventChannelDelayed;

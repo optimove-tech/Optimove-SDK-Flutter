@@ -1,15 +1,15 @@
-#import "OptimoveFlutterSdkPlugin.h"
-#if __has_include(<optimove_sdk_flutter/optimove_sdk_flutter-Swift.h>)
-#import <optimove_sdk_flutter/optimove_sdk_flutter-Swift.h>
+#import "OptimoveFlutterPlugin.h"
+#if __has_include(<optimove_flutter/optimove_flutter-Swift.h>)
+#import <optimove_flutter/optimove_flutter-Swift.h>
 #else
 // Support project import fallback if the generated compatibility header
 // is not copied when this plugin is created as a library.
 // https://forums.swift.org/t/swift-static-libraries-dont-copy-generated-objective-c-header/19816
-#import "optimove_sdk_flutter-Swift.h"
+#import "optimove_flutter-Swift.h"
 #endif
 
-@implementation OptimoveFlutterSdkPlugin
+@implementation OptimoveFlutterPlugin
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
-  [SwiftOptimoveFlutterSdkPlugin registerWithRegistrar:registrar];
+  [SwiftOptimoveFlutterPlugin registerWithRegistrar:registrar];
 }
 @end

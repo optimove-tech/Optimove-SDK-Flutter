@@ -44,7 +44,7 @@ public class PushReceiver extends PushBroadcastReceiver {
         Map<String, Object> event = new HashMap<>(2);
         event.put("type", "push.received");
         event.put("data", pushMessageToMap(pushMessage, null));
-        OptimoveFlutterSdkPlugin.eventSink.send(event, false);
+        OptimoveFlutterPlugin.eventSink.send(event, false);
     }
 
     @Override
@@ -83,7 +83,7 @@ public class PushReceiver extends PushBroadcastReceiver {
             return;
         }
 
-        Activity currentActivity = OptimoveFlutterSdkPlugin.currentActivityRef.get();
+        Activity currentActivity = OptimoveFlutterPlugin.currentActivityRef.get();
         if (null != currentActivity) {
             Intent existingIntent = currentActivity.getIntent();
             addDeepLinkExtras(pushMessage, existingIntent);
@@ -109,6 +109,6 @@ public class PushReceiver extends PushBroadcastReceiver {
         Map<String, Object> event = new HashMap<>(2);
         event.put("type", "push.opened");
         event.put("data", pushMessageToMap(pushMessage, actionId));
-        OptimoveFlutterSdkPlugin.eventSinkDelayed.send(event);
+        OptimoveFlutterPlugin.eventSinkDelayed.send(event);
     }
 }

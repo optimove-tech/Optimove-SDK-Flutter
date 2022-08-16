@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:async';
 import 'dart:convert';
-import 'package:optimove_sdk_flutter/optimove.dart';
+import 'package:optimove_flutter/optimove_flutter.dart';
 
 import 'inbox.dart';
 

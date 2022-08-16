@@ -2,11 +2,11 @@ import Flutter
 import UIKit
 import OptimoveSDK
 
-public class SwiftOptimoveFlutterSdkPlugin: NSObject, FlutterPlugin {
+public class SwiftOptimoveFlutterPlugin: NSObject, FlutterPlugin {
     
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "optimove_flutter_sdk", binaryMessenger: registrar.messenger())
-        let optimoveFlutterPlugin = SwiftOptimoveFlutterSdkPlugin()
+        let optimoveFlutterPlugin = SwiftOptimoveFlutterPlugin()
         optimoveFlutterPlugin.initOptimove(registrar: registrar)
         registrar.addMethodCallDelegate(optimoveFlutterPlugin, channel: channel)
         registrar.addApplicationDelegate(optimoveFlutterPlugin)

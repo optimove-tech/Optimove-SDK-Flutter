@@ -28,8 +28,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.optimove.flutter.OptimoveFlutterSdkPlugin.eventSink;
-import static com.optimove.flutter.OptimoveFlutterSdkPlugin.eventSinkDelayed;
+import static com.optimove.flutter.OptimoveFlutterPlugin.eventSink;
+import static com.optimove.flutter.OptimoveFlutterPlugin.eventSinkDelayed;
 
 public class OptimoveInitProvider extends ContentProvider {
     private static final String TAG = OptimoveInitProvider.class.getName();
