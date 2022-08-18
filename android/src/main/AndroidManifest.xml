@@ -1,0 +1,23 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+  package="com.optimove.flutter">
+  <application>
+      <provider android:name=".OptimoveInitProvider"
+          android:authorities="${applicationId}.optimoveinitprovider"
+          android:exported="false" />
+      <!-- Optimove FCM handler -->
+      <service android:name="com.optimove.android.optimobile.FirebaseMessagingService" android:exported="false">
+          <intent-filter>
+              <action android:name="com.google.firebase.MESSAGING_EVENT" />
+          </intent-filter>
+      </service>
+
+      <receiver android:name=".PushReceiver" android:exported="false">
+          <intent-filter>
+              <action android:name="com.optimove.push.RECEIVED" />
+              <action android:name="com.optimove.push.OPENED" />
+              <action android:name="com.optimove.push.BUTTON_CLICKED" />
+              <action android:name="com.optimove.push.DISMISSED" />
+          </intent-filter>
+      </receiver>
+  </application>
+</manifest>
