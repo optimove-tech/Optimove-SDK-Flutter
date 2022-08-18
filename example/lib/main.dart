@@ -34,7 +34,6 @@ class _MyAppState extends State<HomePage> {
 
   late final TextEditingController eventNameTextController;
 
-  String? optimobileIdentifier = "";
   String optimoveVisitorId = "";
   Map<String, dynamic> eventParams = {};
 
@@ -53,7 +52,7 @@ class _MyAppState extends State<HomePage> {
   }
 
   Future<void> initListeners() async {
-    Optimove.setPushOpenedHandler((push) {
+    Optimove.setPushOpenedAndDeeplinkHandlers((push) {
       _showAlert('Opened Push', <Widget>[
         Text(push.title ?? 'No title'),
         Text(push.message ?? 'No message'),
@@ -62,18 +61,7 @@ class _MyAppState extends State<HomePage> {
         const Text('Data:'),
         Text(jsonEncode(push.data))
       ]);
-    });
-
-    Optimove.setPushReceivedHandler((push) {
-      _showAlert('Received Push', <Widget>[
-        Text(push.title ?? 'No title'),
-        Text(push.message ?? 'No message'),
-        const Text('Data:'),
-        Text(jsonEncode(push.data))
-      ]);
-    });
-
-    Optimove.setDeeplinkHandler((outcome) {
+    }, (outcome) {
       var children = [
         Text('Url: ${outcome.url}'),
         Text('Resolved: ${outcome.resolution}')
@@ -89,6 +77,15 @@ class _MyAppState extends State<HomePage> {
       }
 
       _showAlert('Optimove Deep Link', children);
+    } );
+
+    Optimove.setPushReceivedHandler((push) {
+      _showAlert('Received Push', <Widget>[
+        Text(push.title ?? 'No title'),
+        Text(push.message ?? 'No message'),
+        const Text('Data:'),
+        Text(jsonEncode(push.data))
+      ]);
     });
 
     Optimove.setInAppDeeplinkHandler((data) {
@@ -98,7 +95,6 @@ class _MyAppState extends State<HomePage> {
     });
   }
   Future<void> getIdentifiers() async {
-    optimobileIdentifier = await Optimove.getUserId();
     optimoveVisitorId = await Optimove.getVisitorId();
     setState(() {});
   }
@@ -144,7 +140,6 @@ class _MyAppState extends State<HomePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Container(alignment: Alignment.centerLeft, child: Text("Current user id: $optimobileIdentifier")),
             const SizedBox(height: 8),
             Container(alignment: Alignment.centerLeft, child: Text("Current visitor id: $optimoveVisitorId")),
           ],

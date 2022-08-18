@@ -107,10 +107,6 @@ public class OptimoveFlutterPlugin implements FlutterPlugin, MethodCallHandler, 
       case "getUserId":
         handleGetUserId(result);
         break;
-      case "enableStagingRemoteLogs":
-        Optimove.enableStagingRemoteLogs();
-        result.success(null);
-        break;
       case "inAppMarkAllInboxItemsAsRead":
         result.success(OptimoveInApp.getInstance().markAllInboxItemsAsRead());
         break;

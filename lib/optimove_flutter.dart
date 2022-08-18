@@ -41,22 +41,11 @@ class Optimove {
     return _methodChannel.invokeMethod('reportScreenVisit', {'screenName': screenName, 'screenCategory': screenCategory});
   }
 
-  static Future<String?> getUserId() async {
-    String? userId = await _methodChannel.invokeMethod('getUserId');
-    return userId;
-  }
-
   static void pushRequestDeviceToken() {
     if (Platform.isIOS) {
       _methodChannel.invokeMethod('pushRequestDeviceToken');
     } else if (Platform.isAndroid) {
       _methodChannel.invokeMethod('pushRegister');
-    }
-  }
-
-  static void enableStagingRemoteLogs() {
-    if (Platform.isAndroid) {
-      _methodChannel.invokeMethod('enableStagingRemoteLogs');
     }
   }
 
@@ -118,12 +107,8 @@ class Optimove {
     initImmediateStreamIfNeeded();
   }
 
-  static void setPushOpenedHandler(void Function(OptimovePushNotification)? pushOpenedHandler) {
+  static void setPushOpenedAndDeeplinkHandlers(void Function(OptimovePushNotification)? pushOpenedHandler, void Function(OptimoveDeepLinkOutcome)? deepLinkHandler) {
     _pushOpenedHandler = pushOpenedHandler;
-    initDelayedStreamIfNeeded();
-  }
-
-  static void setDeeplinkHandler(void Function(OptimoveDeepLinkOutcome)? deepLinkHandler) {
     _deepLinkHandler = deepLinkHandler;
     initDelayedStreamIfNeeded();
   }
