@@ -61,7 +61,7 @@ class Optimove {
     return OptimoveInAppInboxSummary(result['totalCount'], result['unreadCount']);
   }
 
-  static Future<void> updateConsentForUser(bool consentGiven) async {
+  static Future<void> inAppUpdateConsentForUser(bool consentGiven) async {
     return _methodChannel.invokeMethod('inAppUpdateConsent', <String, bool>{
       'consentGiven': consentGiven
     });
