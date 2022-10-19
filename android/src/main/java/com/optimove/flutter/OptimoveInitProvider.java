@@ -178,25 +178,33 @@ public class OptimoveInitProvider extends ContentProvider {
         }
     }
 
-    private void setAdditionalListeners(){
-        Optimove.getInstance().setPushActionHandler(PushReceiver::handlePushOpen);
+    private void setAdditionalListeners() {
+        Optimove.getInstance()
+                .setPushActionHandler(PushReceiver::handlePushOpen);
 
-        OptimoveInApp.getInstance().setOnInboxUpdated(() -> {
-            Map<String, String> event = new HashMap<>(1);
-            event.put("type", "inbox.updated");
-            eventSink.send(event);
-        });
+        OptimoveInApp.getInstance()
+                .setOnInboxUpdated(() -> {
+                    Map<String, String> event = new HashMap<>(1);
+                    event.put("type", "inbox.updated");
+                    eventSink.send(event);
+                });
 
-        OptimoveInApp.getInstance().setDeepLinkHandler((context, data) -> {
-            Map<String, Object> event = new HashMap<>(2);
-            event.put("type", "in-app.deepLinkPressed");
-            try {
-                event.put("data", JsonUtils.toMap(data.getDeepLinkData()));
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
-            eventSink.send(event);
-        });
+        OptimoveInApp.getInstance()
+                .setDeepLinkHandler((context, data) -> {
+                    Map<String, Object> event = new HashMap<>(2);
+                    Map<String, Object> eventData = new HashMap<>(3);
+                    event.put("type", "in-app.deepLinkPressed");
+                    eventData.put("messageId", data.getMessageId());
+                    try {
+                        eventData.put("deepLinkData", JsonUtils.toMap(data.getDeepLinkData()));
+                        eventData.put("messageData",
+                                data.getMessageData() != null ? JsonUtils.toMap(data.getMessageData()) : null);
+                    } catch (Throwable e) {
+                        e.printStackTrace();
+                    }
+                    event.put("data", eventData);
+                    eventSink.send(event);
+                });
     }
 
     private void configureDeepLinking(@NonNull OptimoveConfig.Builder config, @Nullable String deepLinkingCname) {
@@ -210,7 +218,7 @@ public class OptimoveInitProvider extends ContentProvider {
         config.enableDeepLinking(deferredDeepLinkHandlerInterface);
     }
 
-    private DeferredDeepLinkHandlerInterface getDDLHandlerInterface(){
+    private DeferredDeepLinkHandlerInterface getDDLHandlerInterface() {
         return (context, resolution, link, data) -> {
             Map<String, Object> linkMap = null;
             if (null != data) {
