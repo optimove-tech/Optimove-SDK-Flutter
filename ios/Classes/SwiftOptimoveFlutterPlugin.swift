@@ -154,8 +154,7 @@ public class SwiftOptimoveFlutterPlugin: NSObject, FlutterPlugin {
         let inboxItems: [InAppInboxItem] = OptimoveInApp.getInboxItems()
         
         var inboxItemsMaps: [[String: Any?]] = []
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ"
+        let dateFormatter = ISO8601DateFormatter()
         
         inboxItems.forEach { item in
             var inboxItemMap = [String: Any?]()
