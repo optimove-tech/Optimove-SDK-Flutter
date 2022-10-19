@@ -44,8 +44,9 @@ public class SwiftOptimoveFlutterPlugin: NSObject, FlutterPlugin {
         }
         
         if #available(iOS 10, *) {
-            config.setPushReceivedInForegroundHandler(pushReceivedInForegroundHandlerBlock: { notification , UNNotificationPresentationOptions -> Void in
+            config.setPushReceivedInForegroundHandler(pushReceivedInForegroundHandlerBlock: { notification , completionHandler in
                 self.emitPushNotificationReceivedEvent(pushNotification: notification)
+                completionHandler(UNNotificationPresentationOptions.alert)
             })
         }
         
