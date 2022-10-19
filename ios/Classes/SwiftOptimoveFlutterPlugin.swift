@@ -261,9 +261,9 @@ public class SwiftOptimoveFlutterPlugin: NSObject, FlutterPlugin {
     }
     
     private func emitInboxUpdated(){
-        var inAppButtonPressMap = [String: Any?]()
-        inAppButtonPressMap["type"] = EventTypes.inAppInboxUpdated.rawValue
-        self.eventSinkImmediate.send(inAppButtonPressMap)
+        var inAppInboxUpdatedMap = [String: Any?]()
+        inAppInboxUpdatedMap["type"] = EventTypes.inAppInboxUpdated.rawValue
+        self.eventSinkImmediate.send(inAppInboxUpdatedMap)
     }
     
     
