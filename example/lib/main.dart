@@ -88,9 +88,11 @@ class _MyAppState extends State<HomePage> {
       ]);
     });
 
-    Optimove.setInAppDeeplinkHandler((data) {
-      _showAlert('Optimove In app deeplink', [
-        Text(jsonEncode(data))
+    Optimove.setInAppDeeplinkHandler((inAppPress) {
+      _showAlert('Optimove In app deeplink', <Widget>[
+        Text('Message id: ${inAppPress.messageId}'),
+        Text('Message data: ${jsonEncode(inAppPress.messageData)}'),
+        Text('Deeplink data: ${jsonEncode(inAppPress.deepLinkData)}'),
       ]);
     });
   }
@@ -255,7 +257,7 @@ class _MyAppState extends State<HomePage> {
             ElevatedButton(
                 style: _getButtonStyle(),
                 onPressed: () async {
-                  await Optimove.updateConsentForUser(true);
+                  await Optimove.inAppUpdateConsentForUser(true);
                   _showAlert('In-app consent',
                       [const Text('Opted in to in-app messaging')]);
                 },
@@ -263,7 +265,7 @@ class _MyAppState extends State<HomePage> {
             ElevatedButton(
                 style: _getButtonStyle(),
                 onPressed: () async {
-                  await Optimove.updateConsentForUser(false);
+                  await Optimove.inAppUpdateConsentForUser(false);
                   _showAlert('In-app consent',
                       [const Text('Opted out from in-app messaging')]);
                 },

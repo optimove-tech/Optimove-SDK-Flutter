@@ -14,7 +14,7 @@ class Optimove {
   static void Function(OptimovePushNotification)? _pushReceivedHandler;
   static void Function(OptimoveDeepLinkOutcome)? _deepLinkHandler;
   static Function? _inboxUpdatedHandler;
-  static void Function(Map<String, dynamic>)? _inAppDeepLinkHandler;
+  static void Function(OptimoveInAppButtonPress)? _inAppDeepLinkHandler;
 
   static Future<void> registerUser({required String userId, required String email}) async {
     return _methodChannel.invokeMethod('registerUser', {'userId': userId, 'email': email});
@@ -113,7 +113,7 @@ class Optimove {
     initDelayedStreamIfNeeded();
   }
 
-  static void setInAppDeeplinkHandler(void Function(Map<String, dynamic>)? inAppDeepLinkHandler) {
+  static void setInAppDeeplinkHandler(void Function(OptimoveInAppButtonPress)? inAppDeepLinkHandler) {
     _inAppDeepLinkHandler = inAppDeepLinkHandler;
     initImmediateStreamIfNeeded();
   }
@@ -162,17 +162,16 @@ class Optimove {
   static void initImmediateStream() {
     _eventStreamImmediate = _eventChannelImmediate.receiveBroadcastStream().listen((event) {
       String type = event['type'];
-      Map<String, dynamic> data = Map<String, dynamic>.from(event['data']);
 
       switch (type) {
         case 'push.received':
-          _pushReceivedHandler?.call(OptimovePushNotification.fromMap(data));
+          _pushReceivedHandler?.call(OptimovePushNotification.fromMap(Map<String, dynamic>.from(event['data'])));
           return;
         case 'inbox.updated':
           _inboxUpdatedHandler?.call();
           return;
         case 'in-app.deepLinkPressed':
-          _inAppDeepLinkHandler?.call(data);
+          _inAppDeepLinkHandler?.call(OptimoveInAppButtonPress.fromMap(Map<String, dynamic>.from(event['data'])));
           return;
       }
     });
@@ -193,6 +192,19 @@ class Optimove {
       }
     });
   }
+}
+
+class OptimoveInAppButtonPress {
+  final Map<String, dynamic>? deepLinkData;
+  final int messageId;
+  final Map<String, dynamic>? messageData;
+
+  OptimoveInAppButtonPress(this.deepLinkData, this.messageId, this.messageData);
+
+  OptimoveInAppButtonPress.fromMap(Map<String, dynamic> map)
+      : deepLinkData = map['deepLinkData'] != null ? Map<String, dynamic>.from(map['deepLinkData']) : null,
+        messageId = map['messageId'],
+        messageData = map['messageData'] != null ? Map<String, dynamic>.from(map['messageData']) : null;
 }
 
 class OptimoveInAppInboxSummary {
