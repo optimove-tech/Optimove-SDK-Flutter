@@ -28,6 +28,10 @@ class Optimove {
     return _methodChannel.invokeMethod('setUserEmail', {'email': email});
   }
 
+  static Future<void> signOutUser() async {
+    return _methodChannel.invokeMethod('signOutUser');
+  }
+
   static Future<String> getVisitorId() async {
     String visitorId = await _methodChannel.invokeMethod('getVisitorId');
     return visitorId;
@@ -42,11 +46,11 @@ class Optimove {
   }
 
   static void pushRequestDeviceToken() {
-    if (Platform.isIOS) {
-      _methodChannel.invokeMethod('pushRequestDeviceToken');
-    } else if (Platform.isAndroid) {
-      _methodChannel.invokeMethod('pushRegister');
-    }
+    _methodChannel.invokeMethod('pushRequestDeviceToken');
+  }
+
+  static Future<void> pushUnregister() async {
+    return _methodChannel.invokeMethod('pushUnregister');
   }
 
   static Future<bool> markAllInboxItemsAsRead() async {

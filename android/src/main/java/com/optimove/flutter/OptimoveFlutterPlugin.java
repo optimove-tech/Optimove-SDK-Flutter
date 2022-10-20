@@ -95,6 +95,9 @@ public class OptimoveFlutterPlugin implements FlutterPlugin, MethodCallHandler, 
       case "setUserEmail":
         handleSetUserEmail(call, result);
         break;
+      case "signOutUser":
+        Optimove.getInstance().signOutUser();
+        break;
       case "getVisitorId":
         handleGetVisitorId(result);
         break;
@@ -134,8 +137,11 @@ public class OptimoveFlutterPlugin implements FlutterPlugin, MethodCallHandler, 
       case "inAppDeleteMessageFromInbox":
         deleteInboxItem(call, result);
         break;
-      case "pushRegister":
-        Optimove.getInstance().pushRegister();
+      case "pushRequestDeviceToken":
+        Optimove.getInstance().pushRequestDeviceToken();
+        break;
+      case "pushUnregister":
+        Optimove.getInstance().pushUnregister();
         break;
       default: result.notImplemented();
     }

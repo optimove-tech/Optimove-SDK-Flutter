@@ -181,7 +181,6 @@ class _MyAppState extends State<HomePage> {
                   Optimove.setUserEmail(email: emailTextController.text);
                 },
                 child: const Text("Set email")),
-            const SizedBox(height: 8),
             ElevatedButton(
                 style: _getButtonStyle(),
                 onPressed: () {
@@ -189,6 +188,13 @@ class _MyAppState extends State<HomePage> {
                   getIdentifiers();
                 },
                 child: const Text("Register user")),
+            ElevatedButton(
+                style: _getButtonStyle(),
+                onPressed: () {
+                  Optimove.signOutUser();
+                  getIdentifiers();
+                },
+                child: const Text("Sign out")),
           ],
         ),
       ),
@@ -290,6 +296,12 @@ class _MyAppState extends State<HomePage> {
                   Optimove.pushRequestDeviceToken();
                 },
                 child: const Text("Register push")),
+            ElevatedButton(
+                style: _getButtonStyle(),
+                onPressed: () {
+                  Optimove.pushUnregister();
+                },
+                child: const Text("Unregister push")),
           ],
         ),
       ),

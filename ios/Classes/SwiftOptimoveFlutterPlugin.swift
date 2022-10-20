@@ -15,6 +15,11 @@ public class SwiftOptimoveFlutterPlugin: NSObject, FlutterPlugin {
     private var eventSinkImmediate = QueueStreamHandler()
     private var eventSinkDelayed = QueueStreamHandler()
     
+    private let sdkVersion = "2.0.0"
+    private let sdkType = 105
+    private let runtimeType = 9
+    private let runtimeVersion = "3.0.1";
+
     fileprivate func initOptimove(registrar: FlutterPluginRegistrar) {
         //crash the app if the keys are not found
         let topPath = Bundle.main.path(forResource: registrar.lookupKey(forAsset: "optimove.json"), ofType: nil)!
@@ -61,9 +66,32 @@ public class SwiftOptimoveFlutterPlugin: NSObject, FlutterPlugin {
         config.setInAppDeepLinkHandler { inAppButtonPress in
             self.emitInappButtonPress(inAppButtonPress: inAppButtonPress)
         }
+        
+        overrideInstallInfo(builder: config)
 
         Optimove.initialize(with: config.build())
         setAdditionalListeners()
+    }
+    
+    private func overrideInstallInfo(builder: OptimoveConfigBuilder) -> Void {
+        let runtimeInfo: [String : AnyObject] = [
+            "id": runtimeType as AnyObject,
+            "version": runtimeVersion as AnyObject,
+        ]
+
+        let sdkInfo: [String : AnyObject] = [
+            "id": sdkType as AnyObject,
+            "version": sdkVersion as AnyObject,
+        ]
+
+        builder.setRuntimeInfo(runtimeInfo: runtimeInfo);
+        builder.setSdkInfo(sdkInfo: sdkInfo);
+
+        var isRelease = true
+        #if DEBUG
+            isRelease = false
+        #endif
+        builder.setTargetType(isRelease: isRelease);
     }
     
     private func setAdditionalListeners(){
@@ -83,6 +111,9 @@ public class SwiftOptimoveFlutterPlugin: NSObject, FlutterPlugin {
             case "setUserEmail":
               Optimove.setUserEmail(email: (call.arguments as! Dictionary<String, Any>)["email"] as! String)
               result(nil)
+            case "signOutUser":
+              Optimove.signOutUser()
+              result(nil)
             case "reportEvent":
               handleReportEvent(call)
               result(nil)
@@ -93,6 +124,9 @@ public class SwiftOptimoveFlutterPlugin: NSObject, FlutterPlugin {
               result(Optimove.getVisitorID())
             case "pushRequestDeviceToken":
               Optimove.shared.pushRequestDeviceToken()
+              result(nil)
+            case "pushUnregister":
+              Optimove.shared.pushUnregister()
               result(nil)
             case "inAppMarkAllInboxItemsAsRead":
               result(OptimoveInApp.markAllInboxItemsAsRead());
