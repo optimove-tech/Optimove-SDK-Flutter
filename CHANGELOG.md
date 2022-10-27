@@ -2,7 +2,14 @@
 
 ## 2.0.0
 
-- [Breaking] Updated the ```updateConsentForUser``` API method name to ```inAppUpdateConsentForUser```
+- [Breaking] Updated API method names:
+    1. ```updateConsentForUser``` to ```inAppUpdateConsent```
+    2. ```markAllInboxItemsAsRead``` to ```inAppMarkAllInboxItemsAsRead```
+    3. ```getInboxSummary``` to ```inAppGetInboxSummary```
+    4. ```getInboxItems``` to ```inAppGetInboxItems```
+    5. ```presentInboxMessage``` to ```inAppPresentInboxMessage```
+    6. ```deleteMessageFromInbox``` to ```inAppDeleteMessageFromInbox```
+    7. ```markAsRead``` to ```inAppMarkAsRead```
 - [Breaking] Updated the ```setInAppDeeplinkHandler``` API to receive ``inAppPress`` objects 
 - Updated the Android SDK version to 7.0.0
 - Updated the iOS SDK to version 5.1.1
