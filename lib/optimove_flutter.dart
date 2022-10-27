@@ -53,25 +53,25 @@ class Optimove {
     return _methodChannel.invokeMethod('pushUnregister');
   }
 
-  static Future<bool> markAllInboxItemsAsRead() async {
+  static Future<bool> inAppMarkAllInboxItemsAsRead() async {
     var result = await _methodChannel.invokeMethod<bool>('inAppMarkAllInboxItemsAsRead');
 
     return result ?? false;
   }
 
-  static Future<OptimoveInAppInboxSummary?> getInboxSummary() async {
+  static Future<OptimoveInAppInboxSummary?> inAppGetInboxSummary() async {
     Map<String, dynamic> result = Map<String, dynamic>.from(await _methodChannel.invokeMethod('inAppGetInboxSummary'));
 
     return OptimoveInAppInboxSummary(result['totalCount'], result['unreadCount']);
   }
 
-  static Future<void> inAppUpdateConsentForUser(bool consentGiven) async {
+  static Future<void> inAppUpdateConsent(bool consentGiven) async {
     return _methodChannel.invokeMethod('inAppUpdateConsent', <String, bool>{
       'consentGiven': consentGiven
     });
   }
 
-  static Future<List<OptimoveInAppInboxItem>> getInboxItems() async {
+  static Future<List<OptimoveInAppInboxItem>> inAppGetInboxItems() async {
     var data = await _methodChannel.invokeMethod('inAppGetInboxItems');
 
     if (data == null) {
@@ -82,7 +82,7 @@ class Optimove {
     return items;
   }
 
-  static Future<OptimoveInAppPresentationResult> presentInboxMessage(OptimoveInAppInboxItem item) async {
+  static Future<OptimoveInAppPresentationResult> inAppPresentInboxMessage(OptimoveInAppInboxItem item) async {
     var result = await _methodChannel.invokeMethod<int>('inAppPresentInboxMessage', <String, int>{
       'id': item.id
     });
@@ -90,7 +90,7 @@ class Optimove {
     return result != null ? OptimoveInAppPresentationResult.values[result] : OptimoveInAppPresentationResult.Failed;
   }
 
-  static Future<bool> deleteMessageFromInbox(OptimoveInAppInboxItem item) async {
+  static Future<bool> inAppDeleteMessageFromInbox(OptimoveInAppInboxItem item) async {
     var result = await _methodChannel.invokeMethod<bool>('inAppDeleteMessageFromInbox', <String, int>{
       'id': item.id
     });
@@ -98,7 +98,7 @@ class Optimove {
     return result ?? false;
   }
 
-  static Future<bool> markAsRead(OptimoveInAppInboxItem item) async {
+  static Future<bool> inAppMarkAsRead(OptimoveInAppInboxItem item) async {
     var result = await _methodChannel.invokeMethod<bool>('inAppMarkAsRead', <String, int>{
       'id': item.id
     });

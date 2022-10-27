@@ -75,7 +75,7 @@ class _InboxState extends State<Inbox> {
               IconButton(
                   tooltip: 'Mark all read',
                   onPressed: () {
-                    Optimove.markAllInboxItemsAsRead();
+                    Optimove.inAppMarkAllInboxItemsAsRead();
                   },
                   icon: const Icon(Icons.mark_email_read)),
             ],
@@ -88,8 +88,8 @@ class _InboxState extends State<Inbox> {
 
   _loadState() async {
     try {
-      var items = await Optimove.getInboxItems();
-      var summary = await Optimove.getInboxSummary();
+      var items = await Optimove.inAppGetInboxItems();
+      var summary = await Optimove.inAppGetInboxSummary();
 
       setState(() {
         this.items = items;
@@ -175,7 +175,7 @@ class _InboxState extends State<Inbox> {
                           'View',
                         ),
                         onTap: () {
-                          Optimove.presentInboxMessage(item);
+                          Optimove.inAppPresentInboxMessage(item);
                         },
                       ),
                       ListTile(
@@ -184,7 +184,7 @@ class _InboxState extends State<Inbox> {
                           'Mark as read',
                         ),
                         onTap: () {
-                          Optimove.markAsRead(item);
+                          Optimove.inAppMarkAsRead(item);
                           Navigator.pop(context);
                         },
                       ),
@@ -194,7 +194,7 @@ class _InboxState extends State<Inbox> {
                           'Delete from inbox',
                         ),
                         onTap: () {
-                          Optimove.deleteMessageFromInbox(item);
+                          Optimove.inAppDeleteMessageFromInbox(item);
                           Navigator.pop(context);
                         },
                       )

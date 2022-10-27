@@ -253,7 +253,7 @@ class _MyAppState extends State<HomePage> {
             ElevatedButton(
                 style: _getButtonStyle(),
                 onPressed: () async {
-                  var summary = await Optimove.getInboxSummary();
+                  var summary = await Optimove.inAppGetInboxSummary();
                   _showAlert('In-app inbox summary', [
                     Text(
                         'Total: ${summary?.totalCount} Unread: ${summary?.unreadCount}')
@@ -263,7 +263,7 @@ class _MyAppState extends State<HomePage> {
             ElevatedButton(
                 style: _getButtonStyle(),
                 onPressed: () async {
-                  await Optimove.inAppUpdateConsentForUser(true);
+                  await Optimove.inAppUpdateConsent(true);
                   _showAlert('In-app consent',
                       [const Text('Opted in to in-app messaging')]);
                 },
@@ -271,7 +271,7 @@ class _MyAppState extends State<HomePage> {
             ElevatedButton(
                 style: _getButtonStyle(),
                 onPressed: () async {
-                  await Optimove.inAppUpdateConsentForUser(false);
+                  await Optimove.inAppUpdateConsent(false);
                   _showAlert('In-app consent',
                       [const Text('Opted out from in-app messaging')]);
                 },
