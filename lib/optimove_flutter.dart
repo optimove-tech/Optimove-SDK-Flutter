@@ -199,14 +199,14 @@ class Optimove {
 }
 
 class OptimoveInAppButtonPress {
-  final Map<String, dynamic>? deepLinkData;
+  final Map<String, dynamic> deepLinkData;
   final int messageId;
   final Map<String, dynamic>? messageData;
 
   OptimoveInAppButtonPress(this.deepLinkData, this.messageId, this.messageData);
 
   OptimoveInAppButtonPress.fromMap(Map<String, dynamic> map)
-      : deepLinkData = map['deepLinkData'] != null ? Map<String, dynamic>.from(map['deepLinkData']) : null,
+      : deepLinkData = Map<String, dynamic>.from(map['deepLinkData']),
         messageId = map['messageId'],
         messageData = map['messageData'] != null ? Map<String, dynamic>.from(map['messageData']) : null;
 }

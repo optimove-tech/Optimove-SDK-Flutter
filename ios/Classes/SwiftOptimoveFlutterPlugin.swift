@@ -18,7 +18,7 @@ public class SwiftOptimoveFlutterPlugin: NSObject, FlutterPlugin {
     private let sdkVersion = "2.0.0"
     private let sdkType = 105
     private let runtimeType = 9
-    private let runtimeVersion = "3.0.1";
+    private let runtimeVersion = "Unknown";
 
     fileprivate func initOptimove(registrar: FlutterPluginRegistrar) {
         //crash the app if the keys are not found

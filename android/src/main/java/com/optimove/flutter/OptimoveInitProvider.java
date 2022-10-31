@@ -45,7 +45,7 @@ public class OptimoveInitProvider extends ContentProvider {
     private static final String SDK_VERSION = "2.0.0";
     private static final int SDK_TYPE = 105;
     private static final int RUNTIME_TYPE = 9;
-    private static final String RUNTIME_VERSION = "3.0.1";
+    private static final String RUNTIME_VERSION = "Unknown";
 
     @Override
     public boolean onCreate() {
