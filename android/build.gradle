@@ -22,7 +22,7 @@ rootProject.allprojects {
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 33
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -34,5 +34,5 @@ android {
     }
 }
 dependencies {
-    api 'com.optimove.android:optimove-android:6.+'
+    api 'com.optimove.android:optimove-android:7.+'
 }

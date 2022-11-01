@@ -95,6 +95,9 @@ public class OptimoveFlutterPlugin implements FlutterPlugin, MethodCallHandler, 
       case "setUserEmail":
         handleSetUserEmail(call, result);
         break;
+      case "signOutUser":
+        Optimove.getInstance().signOutUser();
+        break;
       case "getVisitorId":
         handleGetVisitorId(result);
         break;
@@ -103,9 +106,6 @@ public class OptimoveFlutterPlugin implements FlutterPlugin, MethodCallHandler, 
         break;
       case "reportScreenVisit":
         handleReportScreenVisit(call, result);
-        break;
-      case "getUserId":
-        handleGetUserId(result);
         break;
       case "inAppMarkAllInboxItemsAsRead":
         result.success(OptimoveInApp.getInstance().markAllInboxItemsAsRead());
@@ -134,8 +134,11 @@ public class OptimoveFlutterPlugin implements FlutterPlugin, MethodCallHandler, 
       case "inAppDeleteMessageFromInbox":
         deleteInboxItem(call, result);
         break;
-      case "pushRegister":
-        Optimove.getInstance().pushRegister();
+      case "pushRequestDeviceToken":
+        Optimove.getInstance().pushRequestDeviceToken();
+        break;
+      case "pushUnregister":
+        Optimove.getInstance().pushUnregister();
         break;
       default: result.notImplemented();
     }
@@ -192,11 +195,6 @@ public class OptimoveFlutterPlugin implements FlutterPlugin, MethodCallHandler, 
         result.success(2);
         break;
     }
-  }
-
-  private void handleGetUserId(Result result) {
-    String userIdentifier = Optimove.getInstance().getCurrentUserIdentifier();
-    result.success(userIdentifier);
   }
 
   private void handleReportScreenVisit(MethodCall call, Result result) {

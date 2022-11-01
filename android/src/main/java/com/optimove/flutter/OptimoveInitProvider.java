@@ -19,6 +19,7 @@ import com.optimove.android.optimobile.DeferredDeepLinkHandlerInterface;
 import com.optimove.android.optimobile.OptimoveInApp;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,6 +41,11 @@ public class OptimoveInitProvider extends ContentProvider {
     private static final String IN_APP_AUTO_ENROLL_KEY = "auto-enroll";
     private static final String IN_APP_EXPLICIT_BY_USER_KEY = "explicit-by-user";
     private static final String ENABLE_DDL_KEY = "enableDeferredDeepLinking";
+
+    private static final String SDK_VERSION = "2.0.0";
+    private static final int SDK_TYPE = 105;
+    private static final int RUNTIME_TYPE = 9;
+    private static final String RUNTIME_VERSION = "Unknown";
 
     @Override
     public boolean onCreate() {
@@ -164,6 +170,8 @@ public class OptimoveInitProvider extends ContentProvider {
             configureDeepLinking(configBuilder, deepLinkingCname);
         }
 
+        overrideInstallInfo(configBuilder);
+
         return configBuilder;
     }
 
@@ -178,25 +186,33 @@ public class OptimoveInitProvider extends ContentProvider {
         }
     }
 
-    private void setAdditionalListeners(){
-        Optimove.getInstance().setPushActionHandler(PushReceiver::handlePushOpen);
+    private void setAdditionalListeners() {
+        Optimove.getInstance()
+                .setPushActionHandler(PushReceiver::handlePushOpen);
 
-        OptimoveInApp.getInstance().setOnInboxUpdated(() -> {
-            Map<String, String> event = new HashMap<>(1);
-            event.put("type", "inbox.updated");
-            eventSink.send(event);
-        });
+        OptimoveInApp.getInstance()
+                .setOnInboxUpdated(() -> {
+                    Map<String, String> event = new HashMap<>(1);
+                    event.put("type", "inbox.updated");
+                    eventSink.send(event);
+                });
 
-        OptimoveInApp.getInstance().setDeepLinkHandler((context, data) -> {
-            Map<String, Object> event = new HashMap<>(2);
-            event.put("type", "in-app.deepLinkPressed");
-            try {
-                event.put("data", JsonUtils.toMap(data.getDeepLinkData()));
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
-            eventSink.send(event);
-        });
+        OptimoveInApp.getInstance()
+                .setDeepLinkHandler((context, data) -> {
+                    Map<String, Object> event = new HashMap<>(2);
+                    Map<String, Object> eventData = new HashMap<>(3);
+                    event.put("type", "in-app.deepLinkPressed");
+                    eventData.put("messageId", data.getMessageId());
+                    try {
+                        eventData.put("deepLinkData", JsonUtils.toMap(data.getDeepLinkData()));
+                        eventData.put("messageData",
+                                data.getMessageData() != null ? JsonUtils.toMap(data.getMessageData()) : null);
+                    } catch (Throwable e) {
+                        e.printStackTrace();
+                    }
+                    event.put("data", eventData);
+                    eventSink.send(event);
+                });
     }
 
     private void configureDeepLinking(@NonNull OptimoveConfig.Builder config, @Nullable String deepLinkingCname) {
@@ -210,7 +226,24 @@ public class OptimoveInitProvider extends ContentProvider {
         config.enableDeepLinking(deferredDeepLinkHandlerInterface);
     }
 
-    private DeferredDeepLinkHandlerInterface getDDLHandlerInterface(){
+    private void overrideInstallInfo(@NonNull OptimoveConfig.Builder configBuilder) {
+        JSONObject sdkInfo = new JSONObject();
+        JSONObject runtimeInfo = new JSONObject();
+
+        try {
+            sdkInfo.put("id", SDK_TYPE);
+            sdkInfo.put("version", SDK_VERSION);
+            runtimeInfo.put("id", RUNTIME_TYPE);
+            runtimeInfo.put("version", RUNTIME_VERSION);
+
+            configBuilder.setSdkInfo(sdkInfo);
+            configBuilder.setRuntimeInfo(runtimeInfo);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private DeferredDeepLinkHandlerInterface getDDLHandlerInterface() {
         return (context, resolution, link, data) -> {
             Map<String, Object> linkMap = null;
             if (null != data) {

@@ -14,7 +14,7 @@ class Optimove {
   static void Function(OptimovePushNotification)? _pushReceivedHandler;
   static void Function(OptimoveDeepLinkOutcome)? _deepLinkHandler;
   static Function? _inboxUpdatedHandler;
-  static void Function(Map<String, dynamic>)? _inAppDeepLinkHandler;
+  static void Function(OptimoveInAppButtonPress)? _inAppDeepLinkHandler;
 
   static Future<void> registerUser({required String userId, required String email}) async {
     return _methodChannel.invokeMethod('registerUser', {'userId': userId, 'email': email});
@@ -26,6 +26,10 @@ class Optimove {
 
   static Future<void> setUserEmail({required String email}) async {
     return _methodChannel.invokeMethod('setUserEmail', {'email': email});
+  }
+
+  static Future<void> signOutUser() async {
+    return _methodChannel.invokeMethod('signOutUser');
   }
 
   static Future<String> getVisitorId() async {
@@ -42,32 +46,32 @@ class Optimove {
   }
 
   static void pushRequestDeviceToken() {
-    if (Platform.isIOS) {
-      _methodChannel.invokeMethod('pushRequestDeviceToken');
-    } else if (Platform.isAndroid) {
-      _methodChannel.invokeMethod('pushRegister');
-    }
+    _methodChannel.invokeMethod('pushRequestDeviceToken');
   }
 
-  static Future<bool> markAllInboxItemsAsRead() async {
+  static Future<void> pushUnregister() async {
+    return _methodChannel.invokeMethod('pushUnregister');
+  }
+
+  static Future<bool> inAppMarkAllInboxItemsAsRead() async {
     var result = await _methodChannel.invokeMethod<bool>('inAppMarkAllInboxItemsAsRead');
 
     return result ?? false;
   }
 
-  static Future<OptimoveInAppInboxSummary?> getInboxSummary() async {
+  static Future<OptimoveInAppInboxSummary?> inAppGetInboxSummary() async {
     Map<String, dynamic> result = Map<String, dynamic>.from(await _methodChannel.invokeMethod('inAppGetInboxSummary'));
 
     return OptimoveInAppInboxSummary(result['totalCount'], result['unreadCount']);
   }
 
-  static Future<void> updateConsentForUser(bool consentGiven) async {
+  static Future<void> inAppUpdateConsent(bool consentGiven) async {
     return _methodChannel.invokeMethod('inAppUpdateConsent', <String, bool>{
       'consentGiven': consentGiven
     });
   }
 
-  static Future<List<OptimoveInAppInboxItem>> getInboxItems() async {
+  static Future<List<OptimoveInAppInboxItem>> inAppGetInboxItems() async {
     var data = await _methodChannel.invokeMethod('inAppGetInboxItems');
 
     if (data == null) {
@@ -78,7 +82,7 @@ class Optimove {
     return items;
   }
 
-  static Future<OptimoveInAppPresentationResult> presentInboxMessage(OptimoveInAppInboxItem item) async {
+  static Future<OptimoveInAppPresentationResult> inAppPresentInboxMessage(OptimoveInAppInboxItem item) async {
     var result = await _methodChannel.invokeMethod<int>('inAppPresentInboxMessage', <String, int>{
       'id': item.id
     });
@@ -86,7 +90,7 @@ class Optimove {
     return result != null ? OptimoveInAppPresentationResult.values[result] : OptimoveInAppPresentationResult.Failed;
   }
 
-  static Future<bool> deleteMessageFromInbox(OptimoveInAppInboxItem item) async {
+  static Future<bool> inAppDeleteMessageFromInbox(OptimoveInAppInboxItem item) async {
     var result = await _methodChannel.invokeMethod<bool>('inAppDeleteMessageFromInbox', <String, int>{
       'id': item.id
     });
@@ -94,7 +98,7 @@ class Optimove {
     return result ?? false;
   }
 
-  static Future<bool> markAsRead(OptimoveInAppInboxItem item) async {
+  static Future<bool> inAppMarkAsRead(OptimoveInAppInboxItem item) async {
     var result = await _methodChannel.invokeMethod<bool>('inAppMarkAsRead', <String, int>{
       'id': item.id
     });
@@ -113,7 +117,7 @@ class Optimove {
     initDelayedStreamIfNeeded();
   }
 
-  static void setInAppDeeplinkHandler(void Function(Map<String, dynamic>)? inAppDeepLinkHandler) {
+  static void setInAppDeeplinkHandler(void Function(OptimoveInAppButtonPress)? inAppDeepLinkHandler) {
     _inAppDeepLinkHandler = inAppDeepLinkHandler;
     initImmediateStreamIfNeeded();
   }
@@ -162,17 +166,16 @@ class Optimove {
   static void initImmediateStream() {
     _eventStreamImmediate = _eventChannelImmediate.receiveBroadcastStream().listen((event) {
       String type = event['type'];
-      Map<String, dynamic> data = Map<String, dynamic>.from(event['data']);
 
       switch (type) {
         case 'push.received':
-          _pushReceivedHandler?.call(OptimovePushNotification.fromMap(data));
+          _pushReceivedHandler?.call(OptimovePushNotification.fromMap(Map<String, dynamic>.from(event['data'])));
           return;
         case 'inbox.updated':
           _inboxUpdatedHandler?.call();
           return;
         case 'in-app.deepLinkPressed':
-          _inAppDeepLinkHandler?.call(data);
+          _inAppDeepLinkHandler?.call(OptimoveInAppButtonPress.fromMap(Map<String, dynamic>.from(event['data'])));
           return;
       }
     });
@@ -193,6 +196,19 @@ class Optimove {
       }
     });
   }
+}
+
+class OptimoveInAppButtonPress {
+  final Map<String, dynamic> deepLinkData;
+  final int messageId;
+  final Map<String, dynamic>? messageData;
+
+  OptimoveInAppButtonPress(this.deepLinkData, this.messageId, this.messageData);
+
+  OptimoveInAppButtonPress.fromMap(Map<String, dynamic> map)
+      : deepLinkData = Map<String, dynamic>.from(map['deepLinkData']),
+        messageId = map['messageId'],
+        messageData = map['messageData'] != null ? Map<String, dynamic>.from(map['messageData']) : null;
 }
 
 class OptimoveInAppInboxSummary {

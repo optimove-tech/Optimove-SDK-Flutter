@@ -88,9 +88,11 @@ class _MyAppState extends State<HomePage> {
       ]);
     });
 
-    Optimove.setInAppDeeplinkHandler((data) {
-      _showAlert('Optimove In app deeplink', [
-        Text(jsonEncode(data))
+    Optimove.setInAppDeeplinkHandler((inAppPress) {
+      _showAlert('Optimove In app deeplink', <Widget>[
+        Text('Message id: ${inAppPress.messageId}'),
+        Text('Message data: ${jsonEncode(inAppPress.messageData)}'),
+        Text('Deeplink data: ${jsonEncode(inAppPress.deepLinkData)}'),
       ]);
     });
   }
@@ -179,7 +181,6 @@ class _MyAppState extends State<HomePage> {
                   Optimove.setUserEmail(email: emailTextController.text);
                 },
                 child: const Text("Set email")),
-            const SizedBox(height: 8),
             ElevatedButton(
                 style: _getButtonStyle(),
                 onPressed: () {
@@ -187,6 +188,13 @@ class _MyAppState extends State<HomePage> {
                   getIdentifiers();
                 },
                 child: const Text("Register user")),
+            ElevatedButton(
+                style: _getButtonStyle(),
+                onPressed: () {
+                  Optimove.signOutUser();
+                  getIdentifiers();
+                },
+                child: const Text("Sign out")),
           ],
         ),
       ),
@@ -245,7 +253,7 @@ class _MyAppState extends State<HomePage> {
             ElevatedButton(
                 style: _getButtonStyle(),
                 onPressed: () async {
-                  var summary = await Optimove.getInboxSummary();
+                  var summary = await Optimove.inAppGetInboxSummary();
                   _showAlert('In-app inbox summary', [
                     Text(
                         'Total: ${summary?.totalCount} Unread: ${summary?.unreadCount}')
@@ -255,7 +263,7 @@ class _MyAppState extends State<HomePage> {
             ElevatedButton(
                 style: _getButtonStyle(),
                 onPressed: () async {
-                  await Optimove.updateConsentForUser(true);
+                  await Optimove.inAppUpdateConsent(true);
                   _showAlert('In-app consent',
                       [const Text('Opted in to in-app messaging')]);
                 },
@@ -263,7 +271,7 @@ class _MyAppState extends State<HomePage> {
             ElevatedButton(
                 style: _getButtonStyle(),
                 onPressed: () async {
-                  await Optimove.updateConsentForUser(false);
+                  await Optimove.inAppUpdateConsent(false);
                   _showAlert('In-app consent',
                       [const Text('Opted out from in-app messaging')]);
                 },
@@ -288,6 +296,12 @@ class _MyAppState extends State<HomePage> {
                   Optimove.pushRequestDeviceToken();
                 },
                 child: const Text("Register push")),
+            ElevatedButton(
+                style: _getButtonStyle(),
+                onPressed: () {
+                  Optimove.pushUnregister();
+                },
+                child: const Text("Unregister push")),
           ],
         ),
       ),
