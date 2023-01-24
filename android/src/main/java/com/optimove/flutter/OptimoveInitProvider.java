@@ -61,9 +61,10 @@ public class OptimoveInitProvider extends ContentProvider {
             Log.i(TAG, "Skipping init, no config file found...");
             return true;
         }
+        OptimoveConfig optimoveConfig = config.build();
 
-        Optimove.initialize((Application) getContext().getApplicationContext(), config.build());
-        setAdditionalListeners();
+        Optimove.initialize((Application) getContext().getApplicationContext(), optimoveConfig);
+        setAdditionalListeners(optimoveConfig);
 
         return true;
     }
@@ -186,9 +187,13 @@ public class OptimoveInitProvider extends ContentProvider {
         }
     }
 
-    private void setAdditionalListeners() {
+    private void setAdditionalListeners(OptimoveConfig optimoveConfig) {
         Optimove.getInstance()
                 .setPushActionHandler(PushReceiver::handlePushOpen);
+
+        if (!optimoveConfig.isOptimobileConfigured()) {
+            return;
+        }
 
         OptimoveInApp.getInstance()
                 .setOnInboxUpdated(() -> {
