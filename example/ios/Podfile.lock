@@ -1,6 +1,6 @@
 PODS:
   - Flutter (1.0.0)
-  - optimove_flutter (2.0.0):
+  - optimove_flutter (2.1.0):
     - Flutter
     - OptimoveCore (= 5.1.1)
     - OptimoveSDK (= 5.1.1)
@@ -28,7 +28,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
-  optimove_flutter: 2a8b99b185d47a6119774f82f4ba48eb42e171c3
+  optimove_flutter: 88a0e144502a3ace2a55dac578991257bcbc288a
   OptimoveCore: 491a1609941a2a713a52c7783538967ae787cadf
   OptimoveNotificationServiceExtension: 209c7244d7a3eaf947893cbd8f03f46225f96dca
   OptimoveSDK: 07b78a51c7aa92ac04342389813744038f328559
