@@ -1,6 +1,6 @@
 PODS:
   - Flutter (1.0.0)
-  - optimove_flutter (2.0.0):
+  - optimove_flutter (2.1.0):
     - Flutter
     - OptimoveCore (= 5.1.1)
     - OptimoveSDK (= 5.1.1)
@@ -27,12 +27,12 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/optimove_flutter/ios"
 
 SPEC CHECKSUMS:
-  Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
-  optimove_flutter: 2a8b99b185d47a6119774f82f4ba48eb42e171c3
+  Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+  optimove_flutter: 88a0e144502a3ace2a55dac578991257bcbc288a
   OptimoveCore: 491a1609941a2a713a52c7783538967ae787cadf
   OptimoveNotificationServiceExtension: 209c7244d7a3eaf947893cbd8f03f46225f96dca
   OptimoveSDK: 07b78a51c7aa92ac04342389813744038f328559
 
-PODFILE CHECKSUM: 37e56079f9de013e2e7ba7431df7aa6d70dea9e4
+PODFILE CHECKSUM: 03e498b6efe50dca9c05bf53474dee77dca49c22
 
 COCOAPODS: 1.11.3

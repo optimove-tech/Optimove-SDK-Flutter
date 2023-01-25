@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.0
+
+- Added support for T&T only and Optimobile only initializations
+
 ## 2.0.0
 
 - [Breaking] Updated API method names:

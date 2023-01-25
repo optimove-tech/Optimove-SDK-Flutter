@@ -15,7 +15,7 @@ public class SwiftOptimoveFlutterPlugin: NSObject, FlutterPlugin {
     private var eventSinkImmediate = QueueStreamHandler()
     private var eventSinkDelayed = QueueStreamHandler()
     
-    private let sdkVersion = "2.0.0"
+    private let sdkVersion = "2.1.0"
     private let sdkType = 105
     private let runtimeType = 9
     private let runtimeVersion = "Unknown";
@@ -355,8 +355,8 @@ enum InAppConsentStrategy: String {
 }
 
 class OptimoveKeys: Decodable {
-    let optimoveCredentials: String
-    let optimobileCredentials: String
+    let optimoveCredentials: String?
+    let optimobileCredentials: String?
     var inAppConsentStrategy: InAppConsentStrategy
     var enableDeferredDeepLinking: Bool
     var cname: String?
@@ -367,8 +367,8 @@ class OptimoveKeys: Decodable {
     
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        optimoveCredentials = try container.decode(String.self, forKey: .optimoveCredentials)
-        optimobileCredentials = try container.decode(String.self, forKey: .optimobileCredentials)
+        optimoveCredentials = try? container.decode(String.self, forKey: .optimoveCredentials)
+        optimobileCredentials = try? container.decode(String.self, forKey: .optimobileCredentials)
         let inAppConsentStrategyString: String? = try? container.decode(String.self, forKey: .inAppConsentStrategy)
         
         switch inAppConsentStrategyString {
