@@ -20,6 +20,9 @@ In this guide we will discuss the steps to implement the Optimove Flutter SDK fo
 3. [Deferred Deep Linking](https://github.com/optimove-tech/Optimove-SDK-Flutter/wiki/deferred-deep-linking)
 4. [Testing](https://github.com/optimove-tech/Optimove-SDK-Flutter/wiki/testing-troubleshooting)
 
+> **NOTE**:
+To unlock these capabilities, you will need to have added the relevant OptiMobile channels to your Optimove package. If you can’t see this feature in your Optimove instance, contact your CSM to find out more.
+
 ## License
 
 OptimoveSDK for Flutter is available under the [MIT license](LICENSE).
