@@ -12,8 +12,7 @@ Bump versions in:
 
 -   [ ] `CHANGELOG.md`
 -   [ ] `pubspec.yaml` 
--   [ ] `example/pubspec.yaml` 
--   [ ] `example/ios/Podfile`
+-   [ ] `example/pubspec.yaml`
 -   [ ] `ios/optimove_flutter.podspec` 
 -   [ ] `ios/Classes/SwiftOptimoveFlutterPlugin.swift` 
 -   [ ] `android/src/main/java/com/optimove/flutter/OptimoveInitProvider.java`
