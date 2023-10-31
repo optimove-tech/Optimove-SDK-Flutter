@@ -9,44 +9,21 @@ import com.optimove.android.Optimove;
 import com.optimove.android.optimobile.Optimobile;
 import com.optimove.android.optimobile.PushBroadcastReceiver;
 import com.optimove.android.optimobile.PushMessage;
+import com.optimove.flutter.events.PushOpenedEvent;
+import com.optimove.flutter.events.PushReceivedEvent;
+
 import org.json.JSONException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class PushReceiver extends PushBroadcastReceiver {
 
-    static Map<String, Object> pushMessageToMap(PushMessage pushMessage, String actionId) {
-        Map<String, Object> message = new HashMap<>(6);
-
-        try {
-            message.put("id", pushMessage.getId());
-            message.put("title", pushMessage.getTitle());
-            message.put("message", pushMessage.getMessage());
-            message.put("actionId", actionId);
-            message.put("data", JsonUtils.toMap(pushMessage.getData()));
-
-            if (null != pushMessage.getUrl()) {
-                message.put("url", pushMessage.getUrl().toString());
-            } else {
-                message.put("url", null);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        return message;
-    }
-
     @Override
     protected void onPushReceived(Context context, PushMessage pushMessage) {
         super.onPushReceived(context, pushMessage);
-
-        Map<String, Object> event = new HashMap<>(2);
-        event.put("type", "push.received");
-        event.put("data", pushMessageToMap(pushMessage, null));
-        OptimoveFlutterPlugin.eventSink.send(event, false);
+        OptimoveFlutterPlugin.eventSink.send(new PushReceivedEvent(pushMessage).toMap(), false);
     }
-
+    
     @Override
     protected void onPushOpened(Context context, PushMessage pushMessage) {
         try {
@@ -106,9 +83,6 @@ public class PushReceiver extends PushBroadcastReceiver {
             context.startActivity(launchIntent);
         }
 
-        Map<String, Object> event = new HashMap<>(2);
-        event.put("type", "push.opened");
-        event.put("data", pushMessageToMap(pushMessage, actionId));
-        OptimoveFlutterPlugin.eventSinkDelayed.send(event);
+        OptimoveFlutterPlugin.eventSinkDelayed.send(new PushOpenedEvent(pushMessage).toMap(actionId));
     }
 }
