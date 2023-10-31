@@ -23,7 +23,19 @@ public class PushReceiver extends PushBroadcastReceiver {
         super.onPushReceived(context, pushMessage);
         OptimoveFlutterPlugin.eventSink.send(new PushReceivedEvent(pushMessage).toMap(), false);
     }
-    
+
+    @Override
+    protected Intent getPushOpenActivityIntent(Context context, PushMessage pushMessage) {
+        Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName());
+
+        if (null == launchIntent) {
+            return null;
+        }
+
+        launchIntent.putExtra(PushMessage.EXTRAS_KEY, pushMessage);
+
+        return launchIntent;
+    }
     @Override
     protected void onPushOpened(Context context, PushMessage pushMessage) {
         try {
