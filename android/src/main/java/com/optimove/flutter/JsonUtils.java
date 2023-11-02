@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 // Based on https://gist.github.com/codebutler/2339666
-/** package */ class JsonUtils {
+public class JsonUtils {
 
     public static Map<String, Object> toMap(JSONObject object) throws JSONException {
         Map<String, Object> map = new HashMap<>();

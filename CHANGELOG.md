@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.0
+
+- [Breaking] For push opens don't set launch intent flags. Instead rely on the default launch mode.
+- 
 ## 2.2.0
 
 - Updated the iOS SDK to version 5.2.2
