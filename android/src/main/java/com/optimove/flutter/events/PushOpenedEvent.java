@@ -1,6 +1,7 @@
 package com.optimove.flutter.events;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.optimove.android.optimobile.PushMessage;
 
@@ -12,7 +13,7 @@ public class PushOpenedEvent extends PushEvent {
         super(pushMessage);
     }
 
-    public Map<String, Object> toMap(String actionId) {
+    public Map<String, Object> toMap(@Nullable String actionId) {
         Map<String, Object> event = new HashMap<>(2);
         event.put("type", "push.opened");
         event.put("data", pushMessageToMap(actionId));

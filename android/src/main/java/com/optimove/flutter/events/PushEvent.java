@@ -1,6 +1,7 @@
 package com.optimove.flutter.events;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.optimove.android.optimobile.PushMessage;
 import com.optimove.flutter.JsonUtils;
@@ -18,7 +19,7 @@ public abstract class PushEvent {
         this.pushMessage = pushMessage;
     }
 
-    protected Map<String, Object> pushMessageToMap(String actionId) {
+    protected Map<String, Object> pushMessageToMap(@Nullable String actionId) {
         Map<String, Object> message = new HashMap<>(6);
 
         try {
