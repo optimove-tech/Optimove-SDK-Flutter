@@ -15,7 +15,7 @@ class LocationSection extends StatelessWidget {
             ElevatedButton(
                 style: ElevatedButton.styleFrom(shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16)))),
                 onPressed: _sendLocation,
-                child: const Text('Request location')),
+                child: const Text('Send location update')),
           ],
         ),
       ),
