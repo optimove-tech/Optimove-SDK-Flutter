@@ -1,18 +1,21 @@
 PODS:
   - Flutter (1.0.0)
-  - optimove_flutter (2.1.0):
+  - location (0.0.1):
     - Flutter
-    - OptimoveCore (= 5.1.1)
-    - OptimoveSDK (= 5.1.1)
-  - OptimoveCore (5.1.1)
-  - OptimoveNotificationServiceExtension (5.1.1)
-  - OptimoveSDK (5.1.1):
-    - OptimoveCore (= 5.1.1)
+  - optimove_flutter (3.0.0):
+    - Flutter
+    - OptimoveCore (= 5.2.2)
+    - OptimoveSDK (= 5.2.2)
+  - OptimoveCore (5.2.2)
+  - OptimoveNotificationServiceExtension (5.2.2)
+  - OptimoveSDK (5.2.2):
+    - OptimoveCore (= 5.2.2)
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
+  - location (from `.symlinks/plugins/location/ios`)
   - optimove_flutter (from `.symlinks/plugins/optimove_flutter/ios`)
-  - OptimoveNotificationServiceExtension (~> 5.1.1)
+  - OptimoveNotificationServiceExtension (~> 5.2.2)
 
 SPEC REPOS:
   trunk:
@@ -23,16 +26,19 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   Flutter:
     :path: Flutter
+  location:
+    :path: ".symlinks/plugins/location/ios"
   optimove_flutter:
     :path: ".symlinks/plugins/optimove_flutter/ios"
 
 SPEC CHECKSUMS:
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
-  optimove_flutter: 88a0e144502a3ace2a55dac578991257bcbc288a
-  OptimoveCore: 491a1609941a2a713a52c7783538967ae787cadf
-  OptimoveNotificationServiceExtension: 209c7244d7a3eaf947893cbd8f03f46225f96dca
-  OptimoveSDK: 07b78a51c7aa92ac04342389813744038f328559
+  location: 3a2eed4dd2fab25e7b7baf2a9efefe82b512d740
+  optimove_flutter: 1efd2eebe32eab4a840c54b3fbb19a3a07aa2da8
+  OptimoveCore: fa060aa4e06a280f7f3f433c62d97c92de55aa2c
+  OptimoveNotificationServiceExtension: 79f38d1e4c35ef1e971803a13ebf02560980399c
+  OptimoveSDK: 96940db3c22cbd4b29b0e4258b4d76931eba31ff
 
-PODFILE CHECKSUM: 03e498b6efe50dca9c05bf53474dee77dca49c22
+PODFILE CHECKSUM: f28489c4bf442e216ffdc1db41680f2d6084f76a
 
-COCOAPODS: 1.11.3
+COCOAPODS: 1.12.1

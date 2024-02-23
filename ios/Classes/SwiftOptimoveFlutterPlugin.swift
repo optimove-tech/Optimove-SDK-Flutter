@@ -1,4 +1,5 @@
 import Flutter
+import CoreLocation
 import UIKit
 import OptimoveSDK
 
@@ -143,6 +144,8 @@ public class SwiftOptimoveFlutterPlugin: NSObject, FlutterPlugin {
               inAppGetInboxItems(result)
             case "inAppPresentInboxMessage":
               inAppPresentInboxMessage(call, result)
+            case "sendLocationUpdate":
+              handleSendLocationUpdate(call, result)
             default:
               result(nil)
         }
@@ -169,6 +172,16 @@ public class SwiftOptimoveFlutterPlugin: NSObject, FlutterPlugin {
         case .FAILED:
             result(2)
         }
+    }
+    
+    private func handleSendLocationUpdate(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
+        let arguments: Dictionary<String, Any> = call.arguments as! Dictionary<String, Any>
+        
+        let latitude = arguments["latitude"] as! Double
+        let longitude = arguments["longitude"] as! Double
+        
+        Optimove.shared.sendLocationUpdate(location: CLLocation(latitude: latitude, longitude: longitude))
+        
     }
     
     private func inAppMarkAsRead(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
