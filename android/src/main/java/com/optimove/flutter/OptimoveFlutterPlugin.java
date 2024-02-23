@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.location.Location;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.optimove.android.Optimove;
 import com.optimove.android.optimobile.InAppInboxItem;
@@ -143,6 +144,12 @@ public class OptimoveFlutterPlugin implements FlutterPlugin, MethodCallHandler, 
         break;
       case "sendLocationUpdate":
         handleSendLocationUpdate(call, result);
+        break;
+      case "trackIBeaconProximity":
+        handleTrackIBeaconProximity(call, result);
+        break;
+      case "trackEddystoneBeaconProximity":
+        handleTrackEddystoneBeaconProximity(call, result);
         break;
       default: result.notImplemented();
     }
@@ -308,6 +315,58 @@ public class OptimoveFlutterPlugin implements FlutterPlugin, MethodCallHandler, 
 
     result.success(null);
   }
+
+  private void handleTrackIBeaconProximity(MethodCall call, Result result) {
+    Map<String, Object> beaconProximityData = call.arguments();
+    String uuid = (String) beaconProximityData.get("uuid");
+    Integer majorId = (Integer) beaconProximityData.get("majorId");
+    Integer minorId = (Integer) beaconProximityData.get("minorId");
+
+    if(uuid == null || majorId == null || minorId == null) {
+        result.error("BeaconProximityError", "either uuid, majorId or minorId are missing", null);
+        return;
+    }
+
+    Optimove.IBeaconProximity iBeaconProximity = mapBeaconProximityNumToEnum((Integer) beaconProximityData.get("proximity"));
+
+    Optimove.getInstance().trackIBeaconProximity(uuid, majorId, minorId, iBeaconProximity);
+
+    result.success(null);
+  }
+
+  private Optimove.IBeaconProximity mapBeaconProximityNumToEnum(@Nullable Integer beaconProximity) {
+      if (beaconProximity == null) {
+          return null;
+      }
+
+      switch (beaconProximity) {
+          case 0:
+              return Optimove.IBeaconProximity.FAR;
+          case 1:
+              return Optimove.IBeaconProximity.IMMEDIATE;
+          case 2:
+              return Optimove.IBeaconProximity.NEAR;
+          case 3:
+          default:
+              return Optimove.IBeaconProximity.UNKNOWN;
+      }
+  }
+
+    private void handleTrackEddystoneBeaconProximity(MethodCall call, Result result) {
+        Map<String, Object> beaconProximityData = call.arguments();
+        String hexNamespace = (String) beaconProximityData.get("hexNamespace");
+        String hexInstance = (String) beaconProximityData.get("hexInstance");
+        Double distanceMetres = (Double) beaconProximityData.get("distanceMetres");
+
+        if(hexNamespace == null || hexInstance == null ) {
+            result.error("BeaconProximityError", "either hexNamespace or hexInstance are missing", null);
+            return;
+        }
+
+        Optimove.getInstance().trackEddystoneBeaconProximity(hexNamespace, hexInstance, distanceMetres);
+
+        result.success(null);
+    }
 
   /**
    * package

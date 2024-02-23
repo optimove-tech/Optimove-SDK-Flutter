@@ -112,6 +112,15 @@ class Optimove {
   static Future<void> sendLocationUpdate(Location location) async {
     return _methodChannel.invokeMethod('sendLocationUpdate', location.toMap());
   }
+
+  static Future<void> trackIBeaconProximity(IBeaconProximity iBeaconProximity) async {
+    return _methodChannel.invokeMethod('trackIBeaconProximity', iBeaconProximity.toMap());
+  }
+
+  static Future<void> trackEddystoneBeaconProximity(EddystoneBeaconProximity  eddystoneBeaconProximity) async {
+    return _methodChannel.invokeMethod('trackEddystoneBeaconProximity', eddystoneBeaconProximity.toMap());
+  }
+
   static void setPushReceivedHandler(void Function(OptimovePushNotification)? pushReceivedHandler) {
     _pushReceivedHandler = pushReceivedHandler;
     initImmediateStreamIfNeeded();
