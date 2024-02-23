@@ -1,6 +1,7 @@
 package com.optimove.flutter;
 
 import android.app.Activity;
+import android.location.Location;
 
 import androidx.annotation.NonNull;
 
@@ -139,6 +140,9 @@ public class OptimoveFlutterPlugin implements FlutterPlugin, MethodCallHandler, 
         break;
       case "pushUnregister":
         Optimove.getInstance().pushUnregister();
+        break;
+      case "sendLocationUpdate":
+        handleSendLocationUpdate(call, result);
         break;
       default: result.notImplemented();
     }
@@ -291,6 +295,18 @@ public class OptimoveFlutterPlugin implements FlutterPlugin, MethodCallHandler, 
       results.add(mapped);
     }
     result.success(results);
+  }
+
+  private void handleSendLocationUpdate(MethodCall call, Result result) {
+    Map<String, Object> locationData = call.arguments();
+    Location location = new Location("optimove");
+    location.setLatitude((Double) locationData.get("latitude"));
+    location.setLongitude((Double) locationData.get("longitude"));
+    location.setTime(((Double) locationData.get("time")).longValue());
+
+    Optimove.getInstance().sendLocationUpdate(location);
+
+    result.success(null);
   }
 
   /**

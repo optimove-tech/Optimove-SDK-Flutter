@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
-import 'dart:io' show Platform;
+
+import 'models/location.dart';
+
+export 'models/location.dart';
 
 class Optimove {
   static const MethodChannel _methodChannel = MethodChannel('optimove_flutter_sdk');
@@ -106,6 +109,9 @@ class Optimove {
     return result ?? false;
   }
 
+  static Future<void> sendLocationUpdate(Location location) async {
+    return _methodChannel.invokeMethod('sendLocationUpdate', location.toMap());
+  }
   static void setPushReceivedHandler(void Function(OptimovePushNotification)? pushReceivedHandler) {
     _pushReceivedHandler = pushReceivedHandler;
     initImmediateStreamIfNeeded();
