@@ -146,6 +146,8 @@ public class SwiftOptimoveFlutterPlugin: NSObject, FlutterPlugin {
               inAppPresentInboxMessage(call, result)
             case "sendLocationUpdate":
               handleSendLocationUpdate(call, result)
+            case "trackEddystoneBeaconProximity":
+              handleTrackEddystoneBeaconProximity(call, result)
             default:
               result(nil)
         }
@@ -181,7 +183,16 @@ public class SwiftOptimoveFlutterPlugin: NSObject, FlutterPlugin {
         let longitude = arguments["longitude"] as! Double
         
         Optimove.shared.sendLocationUpdate(location: CLLocation(latitude: latitude, longitude: longitude))
+    }
+
+    private func handleTrackEddystoneBeaconProximity(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
+        let arguments: Dictionary<String, Any> = call.arguments as! Dictionary<String, Any>
         
+        let hexNamespace = arguments["hexNamespace"] as! String
+        let hexInstance = arguments["hexInstance"] as! String
+        let distanceMetres = arguments["distanceMetres"] as? NSNumber
+        
+        Optimove.shared.trackEddystoneBeaconProximity(hexNamespace: hexNamespace, hexInstance: hexInstance, distanceMeters: distanceMetres)
     }
     
     private func inAppMarkAsRead(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
