@@ -15,6 +15,15 @@ class _LocationState extends State<LocationSection> {
   late final TextEditingController distanceMetresTextController;
 
   @override
+  void initState() {
+    super.initState();
+
+    hexNamespaceTextController = TextEditingController();
+    hexInstanceTextController = TextEditingController();
+    distanceMetresTextController = TextEditingController();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Card(
       color: const Color.fromARGB(255, 167, 184, 204),
@@ -25,11 +34,9 @@ class _LocationState extends State<LocationSection> {
           children: [
             ElevatedButton(
                 style: ElevatedButton.styleFrom(shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16)))),
-                onPressed: () {
-                  optimove.Optimove.trackEddystoneBeaconProximity(optimove.EddystoneBeaconProximity(
-                      hexNamespace: hexInstanceTextController.text, hexInstance: hexInstanceTextController.text, distanceMetres:  double.tryParse(distanceMetresTextController.text)));
-                },
+                onPressed: _sendLocation,
                 child: const Text('Send location update')),
+            const SizedBox(height: 16),
             TextField(
                 controller: hexNamespaceTextController,
                 decoration: const InputDecoration(
@@ -47,8 +54,11 @@ class _LocationState extends State<LocationSection> {
                 )),
             ElevatedButton(
                 style: ElevatedButton.styleFrom(shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16)))),
-                onPressed: _sendLocation,
-                child: const Text('Send location update')),
+                onPressed: () {
+                  optimove.Optimove.trackEddystoneBeaconProximity(optimove.EddystoneBeaconProximity(
+                      hexNamespace: hexInstanceTextController.text, hexInstance: hexInstanceTextController.text, distanceMetres:  double.tryParse(distanceMetresTextController.text)));
+                },
+                child: const Text('Track Eddystone Beacon Proximity')),
           ],
         ),
       ),
