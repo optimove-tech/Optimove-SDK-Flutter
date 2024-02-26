@@ -14,26 +14,6 @@ class Location {
   }
 }
 
-class IBeaconProximity {
-  final String uuid;
-  final int majorId;
-  final int minorId;
-  final BeaconProximity beaconProximity;
-
-  IBeaconProximity(this.uuid, this.majorId, this.minorId, this.beaconProximity);
-
-  Map<String, dynamic> toMap() {
-    return {
-      'uuid': uuid,
-      'majorId': majorId,
-      'minorId': minorId,
-      'beaconProximity': beaconProximity.index
-    };
-  }
-}
-
-enum BeaconProximity { Far, Immediate, Near, Unknown }
-
 class EddystoneBeaconProximity {
   final String hexNamespace;
   final String hexInstance;
