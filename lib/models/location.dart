@@ -3,7 +3,7 @@ class Location {
   final double latitude;
   final double time;
 
-  Location(this.longitude, this.latitude, this.time);
+  Location({required this.longitude, required this.latitude, required this.time});
 
   Map<String, dynamic> toMap() {
     return {
@@ -19,7 +19,7 @@ class EddystoneBeaconProximity {
   final String hexInstance;
   final double? distanceMetres;
 
-  EddystoneBeaconProximity(this.hexNamespace, this.hexInstance, this.distanceMetres);
+  EddystoneBeaconProximity({ required this.hexNamespace, required this.hexInstance, required this.distanceMetres});
 
   Map<String, dynamic> toMap() {
     return {
