@@ -1,4 +1,5 @@
 import Flutter
+import CoreLocation
 import UIKit
 import OptimoveSDK
 
@@ -15,7 +16,7 @@ public class SwiftOptimoveFlutterPlugin: NSObject, FlutterPlugin {
     private var eventSinkImmediate = QueueStreamHandler()
     private var eventSinkDelayed = QueueStreamHandler()
     
-    private let sdkVersion = "3.0.0"
+    private let sdkVersion = "3.1.0"
     private let sdkType = 105
     private let runtimeType = 9
     private let runtimeVersion = "Unknown";
@@ -143,6 +144,10 @@ public class SwiftOptimoveFlutterPlugin: NSObject, FlutterPlugin {
               inAppGetInboxItems(result)
             case "inAppPresentInboxMessage":
               inAppPresentInboxMessage(call, result)
+            case "sendLocationUpdate":
+              handleSendLocationUpdate(call, result)
+            case "trackEddystoneBeaconProximity":
+              handleTrackEddystoneBeaconProximity(call, result)
             default:
               result(nil)
         }
@@ -169,6 +174,25 @@ public class SwiftOptimoveFlutterPlugin: NSObject, FlutterPlugin {
         case .FAILED:
             result(2)
         }
+    }
+    
+    private func handleSendLocationUpdate(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
+        let arguments: Dictionary<String, Any> = call.arguments as! Dictionary<String, Any>
+        
+        let latitude = arguments["latitude"] as! Double
+        let longitude = arguments["longitude"] as! Double
+        
+        Optimove.shared.sendLocationUpdate(location: CLLocation(latitude: latitude, longitude: longitude))
+    }
+
+    private func handleTrackEddystoneBeaconProximity(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
+        let arguments: Dictionary<String, Any> = call.arguments as! Dictionary<String, Any>
+        
+        let hexNamespace = arguments["hexNamespace"] as! String
+        let hexInstance = arguments["hexInstance"] as! String
+        let distanceMetres = arguments["distanceMetres"] as? NSNumber
+        
+        Optimove.shared.trackEddystoneBeaconProximity(hexNamespace: hexNamespace, hexInstance: hexInstance, distanceMeters: distanceMetres)
     }
     
     private func inAppMarkAsRead(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {

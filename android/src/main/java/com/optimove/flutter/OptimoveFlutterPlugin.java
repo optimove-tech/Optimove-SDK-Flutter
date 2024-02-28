@@ -1,8 +1,10 @@
 package com.optimove.flutter;
 
 import android.app.Activity;
+import android.location.Location;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.optimove.android.Optimove;
 import com.optimove.android.optimobile.InAppInboxItem;
@@ -139,6 +141,12 @@ public class OptimoveFlutterPlugin implements FlutterPlugin, MethodCallHandler, 
         break;
       case "pushUnregister":
         Optimove.getInstance().pushUnregister();
+        break;
+      case "sendLocationUpdate":
+        handleSendLocationUpdate(call, result);
+        break;
+      case "trackEddystoneBeaconProximity":
+        handleTrackEddystoneBeaconProximity(call, result);
         break;
       default: result.notImplemented();
     }
@@ -292,6 +300,34 @@ public class OptimoveFlutterPlugin implements FlutterPlugin, MethodCallHandler, 
     }
     result.success(results);
   }
+
+  private void handleSendLocationUpdate(MethodCall call, Result result) {
+    Map<String, Object> locationData = call.arguments();
+    Location location = new Location("optimove");
+    location.setLatitude((Double) locationData.get("latitude"));
+    location.setLongitude((Double) locationData.get("longitude"));
+    location.setTime(((Double) locationData.get("time")).longValue());
+
+    Optimove.getInstance().sendLocationUpdate(location);
+
+    result.success(null);
+  }
+
+    private void handleTrackEddystoneBeaconProximity(MethodCall call, Result result) {
+        Map<String, Object> beaconProximityData = call.arguments();
+        String hexNamespace = (String) beaconProximityData.get("hexNamespace");
+        String hexInstance = (String) beaconProximityData.get("hexInstance");
+        Double distanceMetres = (Double) beaconProximityData.get("distanceMetres");
+
+        if(hexNamespace == null || hexInstance == null ) {
+            result.error("BeaconProximityError", "either hexNamespace or hexInstance are missing", null);
+            return;
+        }
+
+        Optimove.getInstance().trackEddystoneBeaconProximity(hexNamespace, hexInstance, distanceMetres);
+
+        result.success(null);
+    }
 
   /**
    * package

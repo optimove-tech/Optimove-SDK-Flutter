@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'dart:async';
 import 'dart:convert';
+
+import 'package:Optimove/widgets/location_section.dart';
+import 'package:flutter/material.dart';
 import 'package:optimove_flutter/optimove_flutter.dart';
 
 import 'inbox.dart';
@@ -62,10 +63,7 @@ class _MyAppState extends State<HomePage> {
         Text(jsonEncode(push.data))
       ]);
     }, (outcome) {
-      var children = [
-        Text('Url: ${outcome.url}'),
-        Text('Resolved: ${outcome.resolution}')
-      ];
+      var children = [Text('Url: ${outcome.url}'), Text('Resolved: ${outcome.resolution}')];
 
       if (outcome.resolution == OptimoveDeepLinkResolution.LinkMatched) {
         children.addAll([
@@ -77,15 +75,10 @@ class _MyAppState extends State<HomePage> {
       }
 
       _showAlert('Optimove Deep Link', children);
-    } );
+    });
 
     Optimove.setPushReceivedHandler((push) {
-      _showAlert('Received Push', <Widget>[
-        Text(push.title ?? 'No title'),
-        Text(push.message ?? 'No message'),
-        const Text('Data:'),
-        Text(jsonEncode(push.data))
-      ]);
+      _showAlert('Received Push', <Widget>[Text(push.title ?? 'No title'), Text(push.message ?? 'No message'), const Text('Data:'), Text(jsonEncode(push.data))]);
     });
 
     Optimove.setInAppDeeplinkHandler((inAppPress) {
@@ -96,6 +89,7 @@ class _MyAppState extends State<HomePage> {
       ]);
     });
   }
+
   Future<void> getIdentifiers() async {
     optimoveVisitorId = await Optimove.getVisitorId();
     setState(() {});
@@ -126,7 +120,20 @@ class _MyAppState extends State<HomePage> {
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
           child: SingleChildScrollView(
             child: Column(
-              children: [_userInfoSection(), _getUserIdentitySection(),const SizedBox(height: 8), _getPushSection(), const SizedBox(height: 8),_getReportEventSection(),const SizedBox(height: 8), _getScreenVisitSection(), const SizedBox(height: 8), _getInAppSection()],
+              children: [
+                _userInfoSection(),
+                _getUserIdentitySection(),
+                const SizedBox(height: 8),
+                _getPushSection(),
+                const SizedBox(height: 8),
+                _getReportEventSection(),
+                const SizedBox(height: 8),
+                _getScreenVisitSection(),
+                const SizedBox(height: 8),
+                _getInAppSection(),
+                const SizedBox(height: 8),
+                LocationSection(),
+              ],
             ),
           ),
         ),
@@ -246,34 +253,28 @@ class _MyAppState extends State<HomePage> {
             ElevatedButton(
                 style: _getButtonStyle(),
                 onPressed: () async {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => Inbox()));
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => Inbox()));
                 },
                 child: const Text('Inbox')),
             ElevatedButton(
                 style: _getButtonStyle(),
                 onPressed: () async {
                   var summary = await Optimove.inAppGetInboxSummary();
-                  _showAlert('In-app inbox summary', [
-                    Text(
-                        'Total: ${summary?.totalCount} Unread: ${summary?.unreadCount}')
-                  ]);
+                  _showAlert('In-app inbox summary', [Text('Total: ${summary?.totalCount} Unread: ${summary?.unreadCount}')]);
                 },
                 child: const Text('In-app inbox summary')),
             ElevatedButton(
                 style: _getButtonStyle(),
                 onPressed: () async {
                   await Optimove.inAppUpdateConsent(true);
-                  _showAlert('In-app consent',
-                      [const Text('Opted in to in-app messaging')]);
+                  _showAlert('In-app consent', [const Text('Opted in to in-app messaging')]);
                 },
                 child: const Text('Opt in')),
             ElevatedButton(
                 style: _getButtonStyle(),
                 onPressed: () async {
                   await Optimove.inAppUpdateConsent(false);
-                  _showAlert('In-app consent',
-                      [const Text('Opted out from in-app messaging')]);
+                  _showAlert('In-app consent', [const Text('Opted out from in-app messaging')]);
                 },
                 child: const Text('Opt out')),
           ],
@@ -324,7 +325,7 @@ class _MyAppState extends State<HomePage> {
             ElevatedButton(
                 style: _getButtonStyle(),
                 onPressed: () {
-                  Optimove.reportEvent(event: eventNameTextController.text, parameters: {"string_param":"some_param"});
+                  Optimove.reportEvent(event: eventNameTextController.text, parameters: {"string_param": "some_param"});
                 },
                 child: const Text("Report event")),
           ],

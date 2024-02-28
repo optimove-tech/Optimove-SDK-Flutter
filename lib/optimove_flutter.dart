@@ -1,6 +1,15 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
-import 'dart:io' show Platform;
+
+import 'models/deeplink.dart';
+import 'models/in_app.dart';
+import 'models/location.dart';
+import 'models/push.dart';
+
+export 'models/deeplink.dart';
+export 'models/in_app.dart';
+export 'models/location.dart';
+export 'models/push.dart';
 
 class Optimove {
   static const MethodChannel _methodChannel = MethodChannel('optimove_flutter_sdk');
@@ -106,6 +115,14 @@ class Optimove {
     return result ?? false;
   }
 
+  static Future<void> sendLocationUpdate(Location location) async {
+    return _methodChannel.invokeMethod('sendLocationUpdate', location.toMap());
+  }
+
+  static Future<void> trackEddystoneBeaconProximity(EddystoneBeaconProximity  eddystoneBeaconProximity) async {
+    return _methodChannel.invokeMethod('trackEddystoneBeaconProximity', eddystoneBeaconProximity.toMap());
+  }
+
   static void setPushReceivedHandler(void Function(OptimovePushNotification)? pushReceivedHandler) {
     _pushReceivedHandler = pushReceivedHandler;
     initImmediateStreamIfNeeded();
@@ -197,91 +214,3 @@ class Optimove {
     });
   }
 }
-
-class OptimoveInAppButtonPress {
-  final Map<String, dynamic> deepLinkData;
-  final int messageId;
-  final Map<String, dynamic>? messageData;
-
-  OptimoveInAppButtonPress(this.deepLinkData, this.messageId, this.messageData);
-
-  OptimoveInAppButtonPress.fromMap(Map<String, dynamic> map)
-      : deepLinkData = Map<String, dynamic>.from(map['deepLinkData']),
-        messageId = map['messageId'],
-        messageData = map['messageData'] != null ? Map<String, dynamic>.from(map['messageData']) : null;
-}
-
-class OptimoveInAppInboxSummary {
-  final int totalCount;
-  final int unreadCount;
-
-  OptimoveInAppInboxSummary(this.totalCount, this.unreadCount);
-}
-
-class OptimovePushNotification {
-  final String? title;
-  final String? message;
-  final Map<String, dynamic>? data;
-  final String? url;
-  final String? actionId;
-
-  OptimovePushNotification(this.title, this.message, this.data, this.url, this.actionId);
-
-  OptimovePushNotification.fromMap(Map<String, dynamic> map)
-      : title = map['title'],
-        message = map['message'],
-        data = map['data'] != null ? Map<String, dynamic>.from(map['data']) : null,
-        url = map['url'],
-        actionId = map['actionId'];
-}
-
-enum OptimoveDeepLinkResolution { LookupFailed, LinkNotFound, LinkExpired, LimitExceeded, LinkMatched }
-
-class OptimoveDeepLinkContent {
-  final String? title;
-  final String? description;
-
-  OptimoveDeepLinkContent(this.title, this.description);
-}
-
-class OptimoveDeepLinkOutcome {
-  final OptimoveDeepLinkResolution resolution;
-  final String url;
-  final OptimoveDeepLinkContent? content;
-  final Map<String, dynamic>? linkData;
-
-  OptimoveDeepLinkOutcome(this.resolution, this.url, this.content, this.linkData);
-
-  OptimoveDeepLinkOutcome.fromMap(Map<String, dynamic> map)
-      : resolution = OptimoveDeepLinkResolution.values[map['resolution']],
-        url = map['url'],
-        content = map['link']?['content'] != null ? OptimoveDeepLinkContent(map['link']['content']['title'], map['link']['content']['description']) : null,
-        linkData = map['link']?['data'] != null ? Map<String, dynamic>.from(map['link']['data']) : null;
-}
-
-class OptimoveInAppInboxItem {
-  final int id;
-  final String title;
-  final String subtitle;
-  final DateTime? availableFrom; // Date?
-  final DateTime? availableTo;
-  final DateTime? dismissedAt;
-  final DateTime sentAt;
-  final Map<String, dynamic>? data;
-  final bool isRead;
-  final String? imageUrl;
-
-  OptimoveInAppInboxItem.fromMap(Map<String, dynamic> map)
-      : id = map['id'],
-        title = map['title'],
-        subtitle = map['subtitle'],
-        sentAt = DateTime.parse(map['sentAt']),
-        availableFrom = map['availableFrom'] != null ? DateTime.parse(map['availableFrom']) : null,
-        availableTo = map['availableTo'] != null ? DateTime.parse(map['availableTo']) : null,
-        data =  map['data'] != null ? Map<String, dynamic>.from(map['data']) : null,
-        dismissedAt = map['dismissedAt'] != null ? DateTime.parse(map['dismissedAt']) : null,
-        isRead = map['isRead'],
-        imageUrl = map['imageUrl'];
-}
-
-enum OptimoveInAppPresentationResult { Presented, Expired, Failed }
