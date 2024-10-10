@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.2.0
+
+- Added small icon customization in Android
+
 ## 3.1.0
 
 - Added sendLocationUpdate API
