@@ -37,6 +37,7 @@ public class OptimoveInitProvider extends ContentProvider {
 
     private static final String OPTIMOVE_CREDENTIALS_KEY = "optimoveCredentials";
     private static final String OPTIMOBILE_CREDENTIALS_KEY = "optimobileCredentials";
+    private static final String PUSH_ANDROID_ICON_RESOURCE = "pushAndroidIconResource";
     private static final String IN_APP_CONSENT_STRATEGY_KEY = "inAppConsentStrategy";
     private static final String IN_APP_AUTO_ENROLL_KEY = "auto-enroll";
     private static final String IN_APP_EXPLICIT_BY_USER_KEY = "explicit-by-user";
@@ -124,6 +125,7 @@ public class OptimoveInitProvider extends ContentProvider {
         String optimoveCredentials = null;
         String optimobileCredentilas = null;
         String inAppConsentStrategy = null;
+        String pushAndroidIconResourceName = null;
         boolean enableDeepLinking = false;
         String deepLinkingCname = null;
 
@@ -137,6 +139,9 @@ public class OptimoveInitProvider extends ContentProvider {
                         break;
                     case OPTIMOBILE_CREDENTIALS_KEY:
                         optimobileCredentilas = reader.nextString();
+                        break;
+                    case PUSH_ANDROID_ICON_RESOURCE:
+                        pushAndroidIconResourceName = reader.nextString();
                         break;
                     case IN_APP_CONSENT_STRATEGY_KEY:
                         inAppConsentStrategy = reader.nextString();
@@ -169,6 +174,9 @@ public class OptimoveInitProvider extends ContentProvider {
         }
         if (enableDeepLinking) {
             configureDeepLinking(configBuilder, deepLinkingCname);
+        }
+        if (pushAndroidIconResourceName != null && getContext() != null) {
+            configBuilder.setPushSmallIconId(getContext().getResources().getIdentifier(pushAndroidIconResourceName, "drawable", getContext().getPackageName()));
         }
 
         overrideInstallInfo(configBuilder);
