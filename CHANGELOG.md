@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.2.1
+
+- Updated the iOS SDK to version `~> 6.1.0`
+
 ## 3.2.0
 
 - Added small icon customization in Android
