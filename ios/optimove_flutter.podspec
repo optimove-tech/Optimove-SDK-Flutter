@@ -20,6 +20,6 @@ The Optimove SDK framework is used for reporting events and receive push notific
   # Flutter.framework does not contain a i386 slice.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
   s.swift_version = '5.0'
-  s.dependency 'OptimoveCore', '5.2.2'
-  s.dependency 'OptimoveSDK', '5.2.2'
+  s.dependency 'OptimoveCore', '~> 6.1.0'
+  s.dependency 'OptimoveSDK', '~> 6.1.0'
 end
