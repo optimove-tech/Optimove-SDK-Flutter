@@ -23,6 +23,12 @@ class OptimoveInAppInboxItem {
         imageUrl = map['imageUrl'];
 }
 
+enum OptimoveInAppDisplayMode { automatic, paused }
+
+extension OptimoveInAppDisplayModeString on OptimoveInAppDisplayMode {
+  String toStringValue() => this == OptimoveInAppDisplayMode.automatic ? "automatic" : "paused";
+}
+
 enum OptimoveInAppPresentationResult { Presented, Expired, Failed }
 
 class OptimoveInAppButtonPress {
