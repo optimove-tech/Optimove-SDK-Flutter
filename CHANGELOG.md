@@ -11,6 +11,8 @@
   - Fix Xcode 16 OptimoveSDK warnings
   - Fix deeplink decoding issue
   - Remove SetUserAgent event
+- Added `inAppSetDisplayMode` API
+- Added support for `inAppDisplayMode` key in the `optimove.json` initialization file 
 
 ## 3.2.0
 
@@ -18,8 +20,8 @@
 
 ## 3.1.0
 
-- Added sendLocationUpdate API
-- Added trackEddystoneBeaconProximity API
+- Added `sendLocationUpdate` API
+- Added `trackEddystoneBeaconProximity` API
 
 ## 3.0.0
 
