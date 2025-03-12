@@ -23,7 +23,13 @@ class OptimoveInAppInboxItem {
         imageUrl = map['imageUrl'];
 }
 
-enum OptimoveInAppPresentationResult { Presented, Expired, Failed }
+enum OptimoveInAppDisplayMode { automatic, paused }
+
+extension OptimoveInAppDisplayModeString on OptimoveInAppDisplayMode {
+  String toStringValue() => this == OptimoveInAppDisplayMode.automatic ? "automatic" : "paused";
+}
+
+enum OptimoveInAppPresentationResult { Presented, Expired, Failed, Paused }
 
 class OptimoveInAppButtonPress {
   final Map<String, dynamic> deepLinkData;

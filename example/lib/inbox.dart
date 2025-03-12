@@ -47,43 +47,27 @@ class _InboxState extends State<Inbox> {
       content = _renderInbox();
     }
 
-    return MaterialApp(
-      theme: ThemeData(
-          colorScheme: const ColorScheme(
-            brightness: Brightness.light,
-            primary: Color.fromARGB(255, 255, 133, 102),
-            onPrimary: Colors.white,
-            secondary: Colors.pink,
-            onSecondary: Colors.pink,
-            error: Colors.pink,
-            onError: Colors.pink,
-            background: Colors.pink,
-            onBackground: Colors.pink,
-            surface: Colors.pink,
-            onSurface: Colors.black,
-          )),
-      home: Scaffold(
-          appBar: AppBar(
-            leading: BackButton(
-                color: Colors.white,
-                onPressed: () {
-                    Navigator.pop(context);
-                },
-            ),
-            title: const Text('In-app inbox'),
-            actions: [
-              IconButton(
-                  tooltip: 'Mark all read',
-                  onPressed: () {
-                    Optimove.inAppMarkAllInboxItemsAsRead();
-                  },
-                  icon: const Icon(Icons.mark_email_read)),
-            ],
+    return Scaffold(
+        appBar: AppBar(
+          leading: BackButton(
+            color: Colors.white,
+            onPressed: () {
+              Navigator.pop(context);
+            },
           ),
-          body: SafeArea(
-            child: content,
-          )),
-    );
+          title: const Text('In-app inbox'),
+          actions: [
+            IconButton(
+                tooltip: 'Mark all read',
+                onPressed: () {
+                  Optimove.inAppMarkAllInboxItemsAsRead();
+                },
+                icon: const Icon(Icons.mark_email_read)),
+          ],
+        ),
+        body: SafeArea(
+          child: content,
+        ));
   }
 
   _loadState() async {

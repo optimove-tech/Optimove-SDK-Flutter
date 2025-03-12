@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.optimove.android.Optimove;
+import com.optimove.android.OptimoveConfig;
 import com.optimove.android.optimobile.InAppInboxItem;
 import com.optimove.android.optimobile.OptimoveInApp;
 
@@ -127,6 +128,9 @@ public class OptimoveFlutterPlugin implements FlutterPlugin, MethodCallHandler, 
         OptimoveInApp.getInstance().updateConsentForUser(call.argument("consentGiven"));
         result.success(null);
         break;
+      case "inAppSetDisplayMode":
+        inAppSetDisplayMode(call, result);
+        break;
       case "inAppGetInboxItems":
         getInboxItems(result);
         break;
@@ -178,6 +182,25 @@ public class OptimoveFlutterPlugin implements FlutterPlugin, MethodCallHandler, 
     result.success(deleted);
   }
 
+  private void inAppSetDisplayMode(@NonNull MethodCall call, @NonNull Result result){
+    String displayMode = call.argument("displayMode");
+    if (displayMode == null) {
+      result.error("DisplayModeError", "No display mode param passed", null);
+      return;
+    }
+
+    if (displayMode.equals("automatic")) {
+      OptimoveInApp.getInstance().setDisplayMode(OptimoveConfig.InAppDisplayMode.AUTOMATIC);
+    } else if (displayMode.equals("paused")){
+      OptimoveInApp.getInstance().setDisplayMode(OptimoveConfig.InAppDisplayMode.PAUSED);
+    } else {
+      result.error("DisplayModeError", "The display mode param isn't recognized", null);
+      return;
+    }
+
+    result.success(null);
+  }
+
   private void presentInAppMessage(@NonNull MethodCall call, @NonNull Result result) {
     int id = call.argument("id");
     OptimoveInApp.InboxMessagePresentationResult presentationResult =
@@ -198,6 +221,9 @@ public class OptimoveFlutterPlugin implements FlutterPlugin, MethodCallHandler, 
         break;
       case FAILED_EXPIRED:
         result.success(1);
+        break;
+      case PAUSED:
+        result.success(3);
         break;
       default:
         result.success(2);
