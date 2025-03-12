@@ -224,6 +224,7 @@ public class OptimoveFlutterPlugin implements FlutterPlugin, MethodCallHandler, 
         break;
       case PAUSED:
         result.success(3);
+        break;
       default:
         result.success(2);
         break;
