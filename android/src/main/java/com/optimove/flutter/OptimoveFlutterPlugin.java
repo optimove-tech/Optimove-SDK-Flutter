@@ -222,6 +222,8 @@ public class OptimoveFlutterPlugin implements FlutterPlugin, MethodCallHandler, 
       case FAILED_EXPIRED:
         result.success(1);
         break;
+      case PAUSED:
+        result.success(3);
       default:
         result.success(2);
         break;

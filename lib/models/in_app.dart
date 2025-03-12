@@ -29,7 +29,7 @@ extension OptimoveInAppDisplayModeString on OptimoveInAppDisplayMode {
   String toStringValue() => this == OptimoveInAppDisplayMode.automatic ? "automatic" : "paused";
 }
 
-enum OptimoveInAppPresentationResult { Presented, Expired, Failed }
+enum OptimoveInAppPresentationResult { Presented, Expired, Failed, Paused }
 
 class OptimoveInAppButtonPress {
   final Map<String, dynamic> deepLinkData;
