@@ -39,11 +39,14 @@ public class OptimoveInitProvider extends ContentProvider {
     private static final String OPTIMOBILE_CREDENTIALS_KEY = "optimobileCredentials";
     private static final String PUSH_ANDROID_ICON_RESOURCE = "pushAndroidIconResource";
     private static final String IN_APP_CONSENT_STRATEGY_KEY = "inAppConsentStrategy";
-    private static final String IN_APP_AUTO_ENROLL_KEY = "auto-enroll";
-    private static final String IN_APP_EXPLICIT_BY_USER_KEY = "explicit-by-user";
+    private static final String IN_APP_CONSENT_AUTO_ENROLL = "auto-enroll";
+    private static final String IN_APP_CONSENT_EXPLICIT_BY_USER = "explicit-by-user";
+    private static final String IN_APP_DISPLAY_MODE_KEY = "inAppDisplayMode";
+    private static final String IN_APP_DISPLAY_MODE_AUTOMATIC = "automatic";
+    private static final String IN_APP_DISPLAY_MODE_PAUSED = "paused";
     private static final String ENABLE_DDL_KEY = "enableDeferredDeepLinking";
 
-    private static final String SDK_VERSION = "3.2.0";
+    private static final String SDK_VERSION = "3.3.0";
     private static final int SDK_TYPE = 105;
     private static final int RUNTIME_TYPE = 9;
     private static final String RUNTIME_VERSION = "Unknown";
@@ -128,6 +131,7 @@ public class OptimoveInitProvider extends ContentProvider {
         String pushAndroidIconResourceName = null;
         boolean enableDeepLinking = false;
         String deepLinkingCname = null;
+        String inAppDisplayMode = null;
 
         try {
             reader.beginObject();
@@ -145,6 +149,9 @@ public class OptimoveInitProvider extends ContentProvider {
                         break;
                     case IN_APP_CONSENT_STRATEGY_KEY:
                         inAppConsentStrategy = reader.nextString();
+                        break;
+                    case IN_APP_DISPLAY_MODE_KEY:
+                        inAppDisplayMode = reader.nextString();
                         break;
                     case ENABLE_DDL_KEY:
                         JsonToken tok = reader.peek();
@@ -169,9 +176,9 @@ public class OptimoveInitProvider extends ContentProvider {
         }
 
         OptimoveConfig.Builder configBuilder = new OptimoveConfig.Builder(optimoveCredentials, optimobileCredentilas);
-        if (inAppConsentStrategy != null) {
-            configureInAppMessaging(configBuilder, inAppConsentStrategy);
-        }
+
+        configureInAppMessaging(configBuilder, inAppConsentStrategy, inAppDisplayMode);
+
         if (enableDeepLinking) {
             configureDeepLinking(configBuilder, deepLinkingCname);
         }
@@ -184,15 +191,32 @@ public class OptimoveInitProvider extends ContentProvider {
         return configBuilder;
     }
 
-    private void configureInAppMessaging(@NonNull OptimoveConfig.Builder config, @NonNull String inAppConsentStrategy) {
-        switch (inAppConsentStrategy) {
-            case IN_APP_AUTO_ENROLL_KEY:
-                config.enableInAppMessaging(OptimoveConfig.InAppConsentStrategy.AUTO_ENROLL);
-                break;
-            case IN_APP_EXPLICIT_BY_USER_KEY:
-                config.enableInAppMessaging(OptimoveConfig.InAppConsentStrategy.EXPLICIT_BY_USER);
-                break;
+    private void configureInAppMessaging(@NonNull OptimoveConfig.Builder config, @Nullable String consentStrategyString, @Nullable String displayModeString) {
+        OptimoveConfig.InAppConsentStrategy consentStrategy = null;
+        OptimoveConfig.InAppDisplayMode displayMode;
+
+        if (consentStrategyString != null && consentStrategyString.equals(IN_APP_CONSENT_AUTO_ENROLL)) {
+            consentStrategy = OptimoveConfig.InAppConsentStrategy.AUTO_ENROLL;
+        } else if (consentStrategyString != null && consentStrategyString.equals(IN_APP_CONSENT_EXPLICIT_BY_USER)) {
+            consentStrategy = OptimoveConfig.InAppConsentStrategy.EXPLICIT_BY_USER;
+        } else {
+            return;
         }
+
+        if (displayModeString == null) {
+            config.enableInAppMessaging(consentStrategy);
+            return;
+        }
+
+        if (displayModeString.equals(IN_APP_DISPLAY_MODE_AUTOMATIC)) {
+            displayMode = OptimoveConfig.InAppDisplayMode.AUTOMATIC;
+        } else if (displayModeString.equals(IN_APP_DISPLAY_MODE_PAUSED)) {
+            displayMode = OptimoveConfig.InAppDisplayMode.PAUSED;
+        } else {
+            return;
+        }
+
+        config.enableInAppMessaging(consentStrategy, displayMode);
     }
 
     private void setAdditionalListeners(OptimoveConfig optimoveConfig) {

@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:Optimove/utils.dart';
+import 'package:Optimove/widgets/in_app_section.dart';
 import 'package:Optimove/widgets/location_section.dart';
 import 'package:flutter/material.dart';
 import 'package:optimove_flutter/optimove_flutter.dart';
-
-import 'inbox.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,6 +37,7 @@ class _MyAppState extends State<HomePage> {
 
   String optimoveVisitorId = "";
   Map<String, dynamic> eventParams = {};
+  OptimoveInAppDisplayMode initialDisplayMode = OptimoveInAppDisplayMode.automatic;
 
   @override
   void initState() {
@@ -54,7 +55,7 @@ class _MyAppState extends State<HomePage> {
 
   Future<void> initListeners() async {
     Optimove.setPushOpenedAndDeeplinkHandlers((push) {
-      _showAlert('Opened Push', <Widget>[
+      Utils.showAlert(context, 'Opened Push', <Widget>[
         Text(push.title ?? 'No title'),
         Text(push.message ?? 'No message'),
         const Text(''),
@@ -74,15 +75,15 @@ class _MyAppState extends State<HomePage> {
         ]);
       }
 
-      _showAlert('Optimove Deep Link', children);
+      Utils.showAlert(context, 'Optimove Deep Link', children);
     });
 
     Optimove.setPushReceivedHandler((push) {
-      _showAlert('Received Push', <Widget>[Text(push.title ?? 'No title'), Text(push.message ?? 'No message'), const Text('Data:'), Text(jsonEncode(push.data))]);
+      Utils.showAlert(context, 'Received Push', <Widget>[Text(push.title ?? 'No title'), Text(push.message ?? 'No message'), const Text('Data:'), Text(jsonEncode(push.data))]);
     });
 
     Optimove.setInAppDeeplinkHandler((inAppPress) {
-      _showAlert('Optimove In app deeplink', <Widget>[
+      Utils.showAlert(context, 'Optimove In app deeplink', <Widget>[
         Text('Message id: ${inAppPress.messageId}'),
         Text('Message data: ${jsonEncode(inAppPress.messageData)}'),
         Text('Deeplink data: ${jsonEncode(inAppPress.deepLinkData)}'),
@@ -101,15 +102,13 @@ class _MyAppState extends State<HomePage> {
       theme: ThemeData(
           colorScheme: const ColorScheme(
         brightness: Brightness.light,
-        primary: Color.fromARGB(255, 255, 133, 102),
+        primary: Colors.white,
         onPrimary: Colors.white,
-        secondary: Colors.pink,
-        onSecondary: Colors.pink,
+        secondary:Color.fromARGB(255, 255, 133, 102),
+        onSecondary: Colors.white,
         error: Colors.pink,
         onError: Colors.pink,
-        background: Colors.pink,
-        onBackground: Colors.pink,
-        surface: Colors.pink,
+        surface: Color.fromARGB(255, 255, 133, 102),
         onSurface: Colors.black,
       )),
       home: Scaffold(
@@ -130,7 +129,7 @@ class _MyAppState extends State<HomePage> {
                 const SizedBox(height: 8),
                 _getScreenVisitSection(),
                 const SizedBox(height: 8),
-                _getInAppSection(),
+                InAppSection(),
                 const SizedBox(height: 8),
                 LocationSection(),
               ],
@@ -171,7 +170,7 @@ class _MyAppState extends State<HomePage> {
                   hintText: 'User id',
                 )),
             ElevatedButton(
-                style: _getButtonStyle(),
+                style: Utils.getButtonStyle(),
                 onPressed: () {
                   Optimove.setUserId(userId: userIdTextController.text);
                   getIdentifiers();
@@ -183,20 +182,20 @@ class _MyAppState extends State<HomePage> {
                   hintText: 'Email',
                 )),
             ElevatedButton(
-                style: _getButtonStyle(),
+                style: Utils.getButtonStyle(),
                 onPressed: () {
                   Optimove.setUserEmail(email: emailTextController.text);
                 },
                 child: const Text("Set email")),
             ElevatedButton(
-                style: _getButtonStyle(),
+                style: Utils.getButtonStyle(),
                 onPressed: () {
                   Optimove.registerUser(userId: userIdTextController.text, email: emailTextController.text);
                   getIdentifiers();
                 },
                 child: const Text("Register user")),
             ElevatedButton(
-                style: _getButtonStyle(),
+                style: Utils.getButtonStyle(),
                 onPressed: () {
                   Optimove.signOutUser();
                   getIdentifiers();
@@ -227,7 +226,7 @@ class _MyAppState extends State<HomePage> {
                   hintText: 'Page category (optional)',
                 )),
             ElevatedButton(
-                style: _getButtonStyle(),
+                style: Utils.getButtonStyle(),
                 onPressed: () {
                   if (pageCategoryTextController.text.isEmpty) {
                     Optimove.reportScreenVisit(screenName: pageTitleTextController.text);
@@ -236,47 +235,6 @@ class _MyAppState extends State<HomePage> {
                   }
                 },
                 child: const Text("Report screen visit")),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _getInAppSection() {
-    return Card(
-      color: const Color.fromARGB(255, 167, 184, 204),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            ElevatedButton(
-                style: _getButtonStyle(),
-                onPressed: () async {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => Inbox()));
-                },
-                child: const Text('Inbox')),
-            ElevatedButton(
-                style: _getButtonStyle(),
-                onPressed: () async {
-                  var summary = await Optimove.inAppGetInboxSummary();
-                  _showAlert('In-app inbox summary', [Text('Total: ${summary?.totalCount} Unread: ${summary?.unreadCount}')]);
-                },
-                child: const Text('In-app inbox summary')),
-            ElevatedButton(
-                style: _getButtonStyle(),
-                onPressed: () async {
-                  await Optimove.inAppUpdateConsent(true);
-                  _showAlert('In-app consent', [const Text('Opted in to in-app messaging')]);
-                },
-                child: const Text('Opt in')),
-            ElevatedButton(
-                style: _getButtonStyle(),
-                onPressed: () async {
-                  await Optimove.inAppUpdateConsent(false);
-                  _showAlert('In-app consent', [const Text('Opted out from in-app messaging')]);
-                },
-                child: const Text('Opt out')),
           ],
         ),
       ),
@@ -292,13 +250,13 @@ class _MyAppState extends State<HomePage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             ElevatedButton(
-                style: _getButtonStyle(),
+                style: Utils.getButtonStyle(),
                 onPressed: () {
                   Optimove.pushRequestDeviceToken();
                 },
                 child: const Text("Register push")),
             ElevatedButton(
-                style: _getButtonStyle(),
+                style: Utils.getButtonStyle(),
                 onPressed: () {
                   Optimove.pushUnregister();
                 },
@@ -323,7 +281,7 @@ class _MyAppState extends State<HomePage> {
                   hintText: 'Event name',
                 )),
             ElevatedButton(
-                style: _getButtonStyle(),
+                style: Utils.getButtonStyle(),
                 onPressed: () {
                   Optimove.reportEvent(event: eventNameTextController.text, parameters: {"string_param": "some_param"});
                 },
@@ -332,32 +290,5 @@ class _MyAppState extends State<HomePage> {
         ),
       ),
     );
-  }
-
-  void _showAlert(String title, List<Widget> children) {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text(title),
-            content: SingleChildScrollView(
-              child: ListBody(
-                children: children,
-              ),
-            ),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        });
-  }
-
-  ButtonStyle _getButtonStyle() {
-    return ElevatedButton.styleFrom(shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16))));
   }
 }

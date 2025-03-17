@@ -80,6 +80,12 @@ class Optimove {
     });
   }
 
+  static Future<void> inAppSetDisplayMode(OptimoveInAppDisplayMode displayMode) async {
+    return _methodChannel.invokeMethod('inAppSetDisplayMode', <String, String>{
+      'displayMode': displayMode.toStringValue()
+    });
+  }
+
   static Future<List<OptimoveInAppInboxItem>> inAppGetInboxItems() async {
     var data = await _methodChannel.invokeMethod('inAppGetInboxItems');
 

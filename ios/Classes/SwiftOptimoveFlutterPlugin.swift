@@ -16,7 +16,7 @@ public class SwiftOptimoveFlutterPlugin: NSObject, FlutterPlugin {
     private var eventSinkImmediate = QueueStreamHandler()
     private var eventSinkDelayed = QueueStreamHandler()
     
-    private let sdkVersion = "3.2.0"
+    private let sdkVersion = "3.3.0"
     private let sdkType = 105
     private let runtimeType = 9
     private let runtimeVersion = "Unknown";
@@ -60,9 +60,7 @@ public class SwiftOptimoveFlutterPlugin: NSObject, FlutterPlugin {
             self.emitPushNotificationOpenedEvent(pushNotification: notification)
         })
         
-        if optimoveKeys.inAppConsentStrategy != .disabled {
-            config.enableInAppMessaging(inAppConsentStrategy: optimoveKeys.inAppConsentStrategy == .autoEnroll ? .autoEnroll : .explicitByUser)
-        }
+        configureInAppMessaging(config: config, optimoveKeys: optimoveKeys)
         
         config.setInAppDeepLinkHandler { inAppButtonPress in
             self.emitInappButtonPress(inAppButtonPress: inAppButtonPress)
@@ -72,6 +70,21 @@ public class SwiftOptimoveFlutterPlugin: NSObject, FlutterPlugin {
 
         Optimove.initialize(with: config.build())
         setAdditionalListeners()
+    }
+    
+    private func configureInAppMessaging(config: OptimoveConfigBuilder, optimoveKeys: OptimoveKeys) {
+        if optimoveKeys.inAppConsentStrategy == .disabled {
+            return
+        }
+        
+        let consentStrategy: OptimoveSDK.InAppConsentStrategy = optimoveKeys.inAppConsentStrategy == .autoEnroll ? .autoEnroll : .explicitByUser
+        
+        if optimoveKeys.inAppDisplayMode == nil {
+            config.enableInAppMessaging(inAppConsentStrategy: consentStrategy)
+            return
+        }
+        
+        config.enableInAppMessaging(inAppConsentStrategy: consentStrategy, defaultDisplayMode: optimoveKeys.inAppDisplayMode == .paused ? .paused : .automatic)
     }
     
     private func overrideInstallInfo(builder: OptimoveConfigBuilder) -> Void {
@@ -138,6 +151,8 @@ public class SwiftOptimoveFlutterPlugin: NSObject, FlutterPlugin {
               result(nil)
             case "inAppMarkAsRead":
               inAppMarkAsRead(call, result)
+            case "inAppSetDisplayMode":
+              inAppSetDisplayMode(call, result)
             case "inAppDeleteMessageFromInbox":
               inAppDeleteMessageFromInbox(call, result)
             case "inAppGetInboxItems":
@@ -173,6 +188,8 @@ public class SwiftOptimoveFlutterPlugin: NSObject, FlutterPlugin {
             result(1)
         case .FAILED:
             result(2)
+        case .PAUSED:
+            result(3)
         }
     }
     
@@ -247,6 +264,18 @@ public class SwiftOptimoveFlutterPlugin: NSObject, FlutterPlugin {
         }
         
         result(deleted)
+    }
+    
+    private func inAppSetDisplayMode(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
+        let displayMode = (call.arguments as! Dictionary<String, Any>)["displayMode"] as! String
+        
+        if displayMode == "automatic" {
+            OptimoveInApp.setDisplayMode(mode: .automatic)
+        } else if displayMode == "paused" {
+            OptimoveInApp.setDisplayMode(mode: .paused)
+        }
+        
+        result(nil)
     }
     
     private func handleInAppInboxSummary(_ result: @escaping FlutterResult) {
@@ -378,15 +407,21 @@ enum InAppConsentStrategy: String {
     case disabled = "in-app-disabled"
 }
 
+enum InAppDisplayMode: String {
+    case automatic = "automatic"
+    case paused = "paused"
+}
+
 class OptimoveKeys: Decodable {
     let optimoveCredentials: String?
     let optimobileCredentials: String?
     var inAppConsentStrategy: InAppConsentStrategy
+    var inAppDisplayMode: InAppDisplayMode?
     var enableDeferredDeepLinking: Bool
     var cname: String?
     
     enum CodingKeys: CodingKey {
-        case optimoveCredentials, optimobileCredentials, inAppConsentStrategy, enableDeferredDeepLinking
+        case optimoveCredentials, optimobileCredentials, inAppConsentStrategy, inAppDisplayMode, enableDeferredDeepLinking
     }
     
     required init(from decoder: Decoder) throws {
@@ -411,6 +446,10 @@ class OptimoveKeys: Decodable {
             cname = enableDeferredDeepLinkingString
         } else {
             enableDeferredDeepLinking = false
+        }
+        
+        if let inAppDisplayModeString = try? container.decode(String.self, forKey: .inAppDisplayMode), inAppDisplayModeString == InAppDisplayMode.paused.rawValue {
+            inAppDisplayMode = .paused
         }
     }
 }
