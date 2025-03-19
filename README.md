@@ -5,23 +5,13 @@
 
 # Integration Guide
 
-In this guide we will discuss the steps to implement the Optimove Flutter SDK for your application.
+This repository contains the Optimove Flutter SDK. However, the documentation has moved to a central location where you can find comprehensive guides for all Optimove SDKs.  
 
-### Setup
+### Getting Started  
+For full integration instructions, follow our **[Getting Started Guide](https://developer.optimove.com/docs/optimobile-getting-started)**. This step-by-step guide walks you through the integration process, with checkpoints to ensure everything is set up and working correctly.  
 
-1. [Initializing the SDK](https://github.com/optimove-tech/Optimove-SDK-Flutter/wiki/Initializing-the-sdk)
-2. [Tracking customers](https://github.com/optimove-tech/Optimove-SDK-Flutter/wiki/Tracking-customers)
-3. [Tracking events](https://github.com/optimove-tech/Optimove-SDK-Flutter/wiki/Tracking-events)
-
-### Mobile Messaging
-
-1. [Push Setup](https://github.com/optimove-tech/Optimove-SDK-Flutter/wiki/push-setup)
-2. [In-App Setup](https://github.com/optimove-tech/Optimove-SDK-Flutter/wiki/in-app)
-3. [Deferred Deep Linking](https://github.com/optimove-tech/Optimove-SDK-Flutter/wiki/deferred-deep-linking)
-4. [Testing](https://github.com/optimove-tech/Optimove-SDK-Flutter/wiki/testing-troubleshooting)
-
-> **NOTE**:
-To unlock these capabilities, you will need to have added the relevant OptiMobile channels to your Optimove package. If you can’t see this feature in your Optimove instance, contact your CSM to find out more.
+### API Reference  
+For a detailed breakdown of the SDK’s capabilities, refer to the **[API Reference](https://developer.optimove.com/reference/api-reference-optimobile-sdk)**. This guide covers SDK initialization, analytics, event tracking, push notifications, in-app messaging, and deferred deep linking across all supported platforms.  
 
 ## License
 
