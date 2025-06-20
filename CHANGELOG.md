@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.3.1
+
+- Updated the iOS SDK to version `~> 6.2.3`:
+  - Fix issue where images with query parameters in dynamic image URLs are not displaying correctly
+  - Fix potential crash when handling push notifications due to method swizzling target resolution in apps using delegate forwarding patterns
+
 ## 3.3.0
 
 - Updated the iOS SDK to version `~> 6.2.0`:
