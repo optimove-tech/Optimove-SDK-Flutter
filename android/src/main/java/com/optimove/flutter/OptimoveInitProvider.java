@@ -46,7 +46,7 @@ public class OptimoveInitProvider extends ContentProvider {
     private static final String IN_APP_DISPLAY_MODE_PAUSED = "paused";
     private static final String ENABLE_DDL_KEY = "enableDeferredDeepLinking";
 
-    private static final String SDK_VERSION = "3.3.0";
+    private static final String SDK_VERSION = "3.3.1";
     private static final int SDK_TYPE = 105;
     private static final int RUNTIME_TYPE = 9;
     private static final String RUNTIME_VERSION = "Unknown";
