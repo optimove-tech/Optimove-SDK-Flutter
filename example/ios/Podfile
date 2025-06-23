@@ -42,5 +42,5 @@ end
 
 target 'NotificationServiceExtension' do
   use_frameworks!
-  pod 'OptimoveNotificationServiceExtension', '~> 6.2.0'
+  pod 'OptimoveNotificationServiceExtension', '~> 6.2.3'
 end
