@@ -2,14 +2,14 @@ PODS:
   - Flutter (1.0.0)
   - location (0.0.1):
     - Flutter
-  - optimove_flutter (3.3.1):
+  - optimove_flutter (3.3.2):
     - Flutter
     - OptimoveCore (~> 6.2.3)
     - OptimoveSDK (~> 6.2.3)
-  - OptimoveCore (6.2.3)
-  - OptimoveNotificationServiceExtension (6.2.3)
-  - OptimoveSDK (6.2.3):
-    - OptimoveCore (= 6.2.3)
+  - OptimoveCore (6.2.6)
+  - OptimoveNotificationServiceExtension (6.2.6)
+  - OptimoveSDK (6.2.6):
+    - OptimoveCore (= 6.2.6)
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
@@ -34,10 +34,10 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   location: 270786085f436c3740dcfa807d11b8b5a70f4425
-  optimove_flutter: 7208043392168a3c776795947beab6d92f871d35
-  OptimoveCore: 0ab3f615f0fd2e608359dd8a1a778f1e18296a5b
-  OptimoveNotificationServiceExtension: cc3fd3b2593298a6121cbf5e4d90025ef0a971a2
-  OptimoveSDK: fc4b8baf31a15ef8121c85dbc169bbfdc67d1c6a
+  optimove_flutter: 228d12fcd955adbdd53b873862c75594ff2c188d
+  OptimoveCore: 4ef53a9d78098c24d57b0f83665cd54206aba40d
+  OptimoveNotificationServiceExtension: c34a2dda2c135366ceaecde695c310a8f7f4e4c9
+  OptimoveSDK: 0513296d50faa3cf5679c81b70563e322bc5fdd3
 
 PODFILE CHECKSUM: 731ccb105f4dcb3004a4a89021879e6571a9aa4e
 
