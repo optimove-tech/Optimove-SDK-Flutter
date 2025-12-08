@@ -16,6 +16,7 @@ import androidx.annotation.Nullable;
 import com.optimove.android.Optimove;
 import com.optimove.android.OptimoveConfig;
 import com.optimove.android.optimobile.DeferredDeepLinkHandlerInterface;
+import com.optimove.android.optimobile.InAppDeepLinkHandlerInterface;
 import com.optimove.android.optimobile.OptimoveInApp;
 
 import org.json.JSONException;
@@ -34,6 +35,8 @@ import static com.optimove.flutter.OptimoveFlutterPlugin.eventSinkDelayed;
 
 public class OptimoveInitProvider extends ContentProvider {
     private static final String TAG = OptimoveInitProvider.class.getName();
+    
+    private InAppDeepLinkHandlerInterface inAppDeepLinkHandler;
 
     private static final String OPTIMOVE_CREDENTIALS_KEY = "optimoveCredentials";
     private static final String OPTIMOBILE_CREDENTIALS_KEY = "optimobileCredentials";
@@ -234,22 +237,23 @@ public class OptimoveInitProvider extends ContentProvider {
                     eventSink.send(event);
                 });
 
-        OptimoveInApp.getInstance()
-                .setDeepLinkHandler((context, data) -> {
-                    Map<String, Object> event = new HashMap<>(2);
-                    Map<String, Object> eventData = new HashMap<>(3);
-                    event.put("type", "in-app.deepLinkPressed");
-                    eventData.put("messageId", data.getMessageId());
-                    try {
-                        eventData.put("deepLinkData", JsonUtils.toMap(data.getDeepLinkData()));
-                        eventData.put("messageData",
-                                data.getMessageData() != null ? JsonUtils.toMap(data.getMessageData()) : null);
-                    } catch (Throwable e) {
-                        e.printStackTrace();
-                    }
-                    event.put("data", eventData);
-                    eventSink.send(event);
-                });
+        inAppDeepLinkHandler = (context, data) -> {
+            Map<String, Object> event = new HashMap<>(2);
+            Map<String, Object> eventData = new HashMap<>(3);
+            event.put("type", "in-app.deepLinkPressed");
+            eventData.put("messageId", data.getMessageId());
+            try {
+                eventData.put("deepLinkData", JsonUtils.toMap(data.getDeepLinkData()));
+                eventData.put("messageData",
+                        data.getMessageData() != null ? JsonUtils.toMap(data.getMessageData()) : null);
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+            event.put("data", eventData);
+            eventSink.send(event);
+        };
+        
+        OptimoveInApp.getInstance().setDeepLinkHandler(inAppDeepLinkHandler);
     }
 
     private void configureDeepLinking(@NonNull OptimoveConfig.Builder config, @Nullable String deepLinkingCname) {
