@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.3.2
+
+- Fixed Android in-app deep link handler being garbage collected by holding a strong reference
+
 ## 3.3.1
 
 - Updated the iOS SDK to version `~> 6.2.3`:

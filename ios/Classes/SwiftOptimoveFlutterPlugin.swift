@@ -16,7 +16,7 @@ public class SwiftOptimoveFlutterPlugin: NSObject, FlutterPlugin {
     private var eventSinkImmediate = QueueStreamHandler()
     private var eventSinkDelayed = QueueStreamHandler()
     
-    private let sdkVersion = "3.3.1"
+    private let sdkVersion = "3.3.2"
     private let sdkType = 105
     private let runtimeType = 9
     private let runtimeVersion = "Unknown";

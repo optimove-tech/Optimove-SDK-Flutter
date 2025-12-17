@@ -35,7 +35,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <!-- Specify which URIs should be matched. Note, domain should be .lnk.click -->
-                <data android:scheme="https" android:host="optiflutter.lnk.click"/>
+                <data android:scheme="https" android:host="optiflutterqa.lnk.click"/>
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.
