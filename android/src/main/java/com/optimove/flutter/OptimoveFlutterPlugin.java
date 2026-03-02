@@ -26,11 +26,13 @@ import java.util.TimeZone;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
+import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
+import io.flutter.plugin.common.StandardMethodCodec;
 
 /** OptimoveFlutterPlugin */
 public class OptimoveFlutterPlugin implements FlutterPlugin, MethodCallHandler, ActivityAware {
@@ -44,7 +46,9 @@ public class OptimoveFlutterPlugin implements FlutterPlugin, MethodCallHandler, 
 
   @Override
   public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
-    methodChannel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "optimove_flutter_sdk");
+    BinaryMessenger messenger = flutterPluginBinding.getBinaryMessenger();
+    BinaryMessenger.TaskQueue taskQueue = messenger.makeBackgroundTaskQueue();
+    methodChannel = new MethodChannel(messenger, "optimove_flutter_sdk", StandardMethodCodec.INSTANCE, taskQueue);
     methodChannel.setMethodCallHandler(this);
 
     eventChannel = new EventChannel(flutterPluginBinding.getBinaryMessenger(), "optimove_flutter_sdk_events");
