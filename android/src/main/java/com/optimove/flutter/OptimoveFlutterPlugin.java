@@ -2,9 +2,10 @@ package com.optimove.flutter;
 
 import android.app.Activity;
 import android.location.Location;
+import android.os.Handler;
+import android.os.Looper;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.optimove.android.Optimove;
 import com.optimove.android.OptimoveConfig;
@@ -22,6 +23,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
@@ -37,6 +40,9 @@ public class OptimoveFlutterPlugin implements FlutterPlugin, MethodCallHandler, 
   private MethodChannel methodChannel;
   private EventChannel eventChannel;
   private EventChannel eventChannelDelayed;
+
+  private final ExecutorService backgroundExecutor = Executors.newSingleThreadExecutor();
+  private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
   static WeakReference<Activity> currentActivityRef = new WeakReference<>(null);
   static QueueingEventStreamHandler eventSink = new QueueingEventStreamHandler();
@@ -63,6 +69,8 @@ public class OptimoveFlutterPlugin implements FlutterPlugin, MethodCallHandler, 
 
     eventChannelDelayed.setStreamHandler(null);
     eventSinkDelayed.onCancel(null);
+
+    backgroundExecutor.shutdown();
   }
 
   @Override
@@ -111,7 +119,10 @@ public class OptimoveFlutterPlugin implements FlutterPlugin, MethodCallHandler, 
         handleReportScreenVisit(call, result);
         break;
       case "inAppMarkAllInboxItemsAsRead":
-        result.success(OptimoveInApp.getInstance().markAllInboxItemsAsRead());
+        backgroundExecutor.execute(() -> {
+          boolean marked = OptimoveInApp.getInstance().markAllInboxItemsAsRead();
+          mainHandler.post(() -> result.success(marked));
+        });
         break;
       case "inAppMarkAsRead":
         markAsRead(call, result);
@@ -121,7 +132,7 @@ public class OptimoveFlutterPlugin implements FlutterPlugin, MethodCallHandler, 
           Map<String, Object> summaryMap = new HashMap<>(2);
           summaryMap.put("totalCount", summary.getTotalCount());
           summaryMap.put("unreadCount", summary.getUnreadCount());
-          result.success(summaryMap);
+          mainHandler.post(() -> result.success(summaryMap));
         });
         break;
       case "inAppUpdateConsent":
@@ -158,28 +169,34 @@ public class OptimoveFlutterPlugin implements FlutterPlugin, MethodCallHandler, 
 
   private void markAsRead(@NonNull MethodCall call, @NonNull Result result) {
     int id = call.argument("id");
-    boolean marked = false;
-    List<InAppInboxItem> items = OptimoveInApp.getInstance().getInboxItems();
-    for (InAppInboxItem item : items) {
-      if (id == item.getId()) {
-        marked = OptimoveInApp.getInstance().markAsRead(item);
-        break;
+    backgroundExecutor.execute(() -> {
+      boolean marked = false;
+      List<InAppInboxItem> items = OptimoveInApp.getInstance().getInboxItems();
+      for (InAppInboxItem item : items) {
+        if (id == item.getId()) {
+          marked = OptimoveInApp.getInstance().markAsRead(item);
+          break;
+        }
       }
-    }
-    result.success(marked);
+      boolean finalMarked = marked;
+      mainHandler.post(() -> result.success(finalMarked));
+    });
   }
 
   private void deleteInboxItem(@NonNull MethodCall call, @NonNull Result result) {
     int id = call.argument("id");
-    boolean deleted = false;
-    List<InAppInboxItem> items = OptimoveInApp.getInstance().getInboxItems();
-    for (InAppInboxItem item : items) {
-      if (id == item.getId()) {
-        deleted = OptimoveInApp.getInstance().deleteMessageFromInbox(item);
-        break;
+    backgroundExecutor.execute(() -> {
+      boolean deleted = false;
+      List<InAppInboxItem> items = OptimoveInApp.getInstance().getInboxItems();
+      for (InAppInboxItem item : items) {
+        if (id == item.getId()) {
+          deleted = OptimoveInApp.getInstance().deleteMessageFromInbox(item);
+          break;
+        }
       }
-    }
-    result.success(deleted);
+      boolean finalDeleted = deleted;
+      mainHandler.post(() -> result.success(finalDeleted));
+    });
   }
 
   private void inAppSetDisplayMode(@NonNull MethodCall call, @NonNull Result result){
@@ -203,32 +220,34 @@ public class OptimoveFlutterPlugin implements FlutterPlugin, MethodCallHandler, 
 
   private void presentInAppMessage(@NonNull MethodCall call, @NonNull Result result) {
     int id = call.argument("id");
-    OptimoveInApp.InboxMessagePresentationResult presentationResult =
-            OptimoveInApp.InboxMessagePresentationResult.FAILED;
-    List<InAppInboxItem> items = OptimoveInApp.getInstance().getInboxItems();
-    for (InAppInboxItem item :
-            items) {
-      if (item.getId() == id) {
-        presentationResult = OptimoveInApp.getInstance().presentInboxMessage(item);
-        break;
+    backgroundExecutor.execute(() -> {
+      OptimoveInApp.InboxMessagePresentationResult presentationResult =
+              OptimoveInApp.InboxMessagePresentationResult.FAILED;
+      List<InAppInboxItem> items = OptimoveInApp.getInstance().getInboxItems();
+      for (InAppInboxItem item : items) {
+        if (item.getId() == id) {
+          presentationResult = OptimoveInApp.getInstance().presentInboxMessage(item);
+          break;
+        }
       }
-    }
 
-    // Map the enum into the order expected in the dart side where its mapped back
-    switch (presentationResult) {
-      case PRESENTED:
-        result.success(0);
-        break;
-      case FAILED_EXPIRED:
-        result.success(1);
-        break;
-      case PAUSED:
-        result.success(3);
-        break;
-      default:
-        result.success(2);
-        break;
-    }
+      int resultCode;
+      switch (presentationResult) {
+        case PRESENTED:
+          resultCode = 0;
+          break;
+        case FAILED_EXPIRED:
+          resultCode = 1;
+          break;
+        case PAUSED:
+          resultCode = 3;
+          break;
+        default:
+          resultCode = 2;
+          break;
+      }
+      mainHandler.post(() -> result.success(resultCode));
+    });
   }
 
   private void handleReportScreenVisit(MethodCall call, Result result) {
@@ -278,53 +297,41 @@ public class OptimoveFlutterPlugin implements FlutterPlugin, MethodCallHandler, 
   }
 
   private void getInboxItems(@NonNull Result result) {
-    SimpleDateFormat formatter;
-    formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
-    formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+    backgroundExecutor.execute(() -> {
+      SimpleDateFormat formatter;
+      formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
+      formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-    List<InAppInboxItem> inboxItems = OptimoveInApp.getInstance().getInboxItems();
-    List<Map<String, Object>> results = new ArrayList<>(inboxItems.size());
-    for (InAppInboxItem item : inboxItems) {
-      Map<String, Object> mapped = new HashMap<>(10);
-      mapped.put("id", item.getId());
-      mapped.put("title", item.getTitle());
-      mapped.put("subtitle", item.getSubtitle());
-      mapped.put("sentAt", formatter.format(item.getSentAt()));
-      mapped.put("isRead", item.isRead());
-      if (item.getData() != null) {
-        try {
-          mapped.put("data",  JsonUtils.toMap(item.getData()));
-        } catch (JSONException e) {
-          e.printStackTrace();
+      List<InAppInboxItem> inboxItems = OptimoveInApp.getInstance().getInboxItems();
+      List<Map<String, Object>> results = new ArrayList<>(inboxItems.size());
+      for (InAppInboxItem item : inboxItems) {
+        Map<String, Object> mapped = new HashMap<>(10);
+        mapped.put("id", item.getId());
+        mapped.put("title", item.getTitle());
+        mapped.put("subtitle", item.getSubtitle());
+        mapped.put("sentAt", formatter.format(item.getSentAt()));
+        mapped.put("isRead", item.isRead());
+        if (item.getData() != null) {
+          try {
+            mapped.put("data", JsonUtils.toMap(item.getData()));
+          } catch (JSONException e) {
+            e.printStackTrace();
+          }
         }
+        mapped.put("imageUrl", item.getImageUrl() != null ? item.getImageUrl().toString() : null);
+
+        Date availableFrom = item.getAvailableFrom();
+        Date availableTo = item.getAvailableTo();
+        Date dismissedAt = item.getDismissedAt();
+
+        mapped.put("availableFrom", availableFrom != null ? formatter.format(availableFrom) : null);
+        mapped.put("availableTo", availableTo != null ? formatter.format(availableTo) : null);
+        mapped.put("dismissedAt", dismissedAt != null ? formatter.format(dismissedAt) : null);
+
+        results.add(mapped);
       }
-      mapped.put("imageUrl", item.getImageUrl() != null ? item.getImageUrl().toString() : null);
-
-      Date availableFrom = item.getAvailableFrom();
-      Date availableTo = item.getAvailableTo();
-      Date dismissedAt = item.getDismissedAt();
-
-      if (null == availableFrom) {
-        mapped.put("availableFrom", null);
-      } else {
-        mapped.put("availableFrom", formatter.format(availableFrom));
-      }
-
-      if (null == availableTo) {
-        mapped.put("availableTo", null);
-      } else {
-        mapped.put("availableTo", formatter.format(availableTo));
-      }
-
-      if (null == dismissedAt) {
-        mapped.put("dismissedAt", null);
-      } else {
-        mapped.put("dismissedAt", formatter.format(dismissedAt));
-      }
-
-      results.add(mapped);
-    }
-    result.success(results);
+      mainHandler.post(() -> result.success(results));
+    });
   }
 
   private void handleSendLocationUpdate(MethodCall call, Result result) {
