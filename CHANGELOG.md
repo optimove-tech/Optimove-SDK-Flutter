@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.3.3
+
+- Fixed ANR by moving blocking calls to a background thread on Android
+
 ## 3.3.2
 
 - Fixed Android in-app deep link handler being garbage collected by holding a strong reference
