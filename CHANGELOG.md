@@ -2,7 +2,7 @@
 
 ## 3.3.4
 
-- Fixed Android build failure on AGP 7.4+/8.x by declaring the plugin's `namespace` in `android/build.gradle` and removing the deprecated `package` attribute from the Android manifest
+- Fixed Android build failure on AGP 8.x by declaring the plugin's `namespace` in `android/build.gradle`
 
 ## 3.3.3
 
