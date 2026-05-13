@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'optimove_flutter'
-  s.version          = '3.3.3'
+  s.version          = '3.3.4'
   s.summary          = 'Optimove SDK Flutter plugin project.'
   s.description      = <<-DESC
 The Optimove SDK framework is used for reporting events and receive push notifications.

@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.3.4
+
+- Fixed Android build failure on AGP 8.x by declaring the plugin's `namespace` in `android/build.gradle`
+
 ## 3.3.3
 
 - Fixed ANR by moving blocking calls to a background thread on Android
