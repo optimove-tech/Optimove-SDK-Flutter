@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.3.5
+
+- Fixed iOS crash at launch when `optimove.json` is missing or can't be read. The plugin now logs a message and skips initialization, matching Android
+
 ## 3.3.4
 
 - Fixed Android build failure on AGP 8.x by declaring the plugin's `namespace` in `android/build.gradle`
