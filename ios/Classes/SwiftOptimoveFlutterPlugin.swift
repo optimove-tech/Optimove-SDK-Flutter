@@ -16,17 +16,22 @@ public class SwiftOptimoveFlutterPlugin: NSObject, FlutterPlugin {
     private var eventSinkImmediate = QueueStreamHandler()
     private var eventSinkDelayed = QueueStreamHandler()
     
-    private let sdkVersion = "3.3.4"
+    private let sdkVersion = "3.3.5"
     private let sdkType = 105
     private let runtimeType = 9
     private let runtimeVersion = "Unknown";
 
     fileprivate func initOptimove(registrar: FlutterPluginRegistrar) {
-        //crash the app if the keys are not found
-        let topPath = Bundle.main.path(forResource: registrar.lookupKey(forAsset: "optimove.json"), ofType: nil)!
-        let jsonData = try! String(contentsOfFile: topPath).data(using: .utf8)
-        let optimoveKeys = try! JSONDecoder().decode(OptimoveKeys.self, from: jsonData!)
-        
+        guard let topPath = Bundle.main.path(forResource: registrar.lookupKey(forAsset: "optimove.json"), ofType: nil) else {
+            NSLog("Optimove: Skipping init, no config file found...")
+            return
+        }
+        guard let jsonData = try? String(contentsOfFile: topPath).data(using: .utf8),
+              let optimoveKeys = try? JSONDecoder().decode(OptimoveKeys.self, from: jsonData) else {
+            NSLog("Optimove: Skipping init, optimove.json could not be read...")
+            return
+        }
+
         let flutterEventChannel: FlutterEventChannel = FlutterEventChannel(name: "optimove_flutter_sdk_events", binaryMessenger: registrar.messenger())
         flutterEventChannel.setStreamHandler(eventSinkImmediate)
         
